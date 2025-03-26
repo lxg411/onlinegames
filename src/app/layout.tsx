@@ -1,38 +1,39 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import { Inter } from "next/font/google";
 import Footer from '@/components/Footer';
+import customImageLoader from '@/lib/imageLoader';
+import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-  fallback: ['system-ui', 'sans-serif'],
-  display: 'swap',
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  fallback: ['monospace'],
-  display: 'swap',
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "OnlineGames.wiki - Discover the Best Online Games",
-  description: "Explore thousands of free online games, no download required, play instantly and challenge your limits with players worldwide",
+  title: "Online Games | Free Browser Games",
+  description: "Play a wide selection of free online games directly in your browser. No downloads, no sign-ups, just instant fun!",
 };
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="next-image-loader" content="custom" />
+      </head>
+      <body className={`${inter.variable} antialiased min-h-screen flex flex-col`}>
+        <main className="flex-grow">{children}</main>
         <Footer />
       </body>
     </html>
   );
 }
+
+export const images = {
+  loader: customImageLoader
+};

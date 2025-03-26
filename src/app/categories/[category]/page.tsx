@@ -100,23 +100,19 @@ export default function CategoryPage({ params }: { params: { category: string } 
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredGames.map(game => (
-              <Link href={`/games/${game.id}`} key={game.id}>
+            {filteredGames.map((game, index) => (
+              <Link href={`/games/${game.id}`} key={game.id} className="group">
                 <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-amber-500/20 transition-all cursor-pointer hover:scale-[1.02]">
-                  <div className="relative h-40 rounded-t-lg overflow-hidden">
+                  <div className="aspect-[4/3] bg-gray-800 overflow-hidden">
                     <Image 
-                      src={game.imageUrl} 
+                      src={game.imageUrl}
                       alt={game.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 384px"
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      priority={index < 4}
+                      unoptimized={process.env.NODE_ENV === 'development'}
                     />
-                    <div className="absolute top-2 right-2">
-                      <div className="bg-black/70 rounded-full px-2 py-1 text-xs flex items-center">
-                        <span className="text-amber-500 mr-1">★</span>
-                        <span>{game.rating.toFixed(1)}</span>
-                      </div>
-                    </div>
                   </div>
                   <div className="p-4">
                     <h3 className="font-bold text-lg mb-1">{game.title}</h3>

@@ -40,13 +40,14 @@ function SearchResultsContent() {
           {searchResults.map(game => (
             <Link href={`/games/${game.id}`} key={game.id}>
               <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-amber-500/20 transition-all cursor-pointer hover:scale-[1.02]">
-                <div className="h-48 bg-gray-700 relative overflow-hidden">
+                <div className="aspect-[4/3] bg-gray-700 relative overflow-hidden">
                   <Image 
-                    src={game.imageUrl} 
+                    src={game.imageUrl}
                     alt={game.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    width={400}
+                    height={300}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    unoptimized={process.env.NODE_ENV === 'development'}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end px-4 py-3">
                     <div>

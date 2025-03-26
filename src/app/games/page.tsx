@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { games, getValidGames } from '../../lib/games';
 import GameEmbed from '@/components/GameEmbed';
+import Image from 'next/image';
 
 // Use valid game data
 export default function GamesPage() {
@@ -119,7 +120,7 @@ export default function GamesPage() {
         
         {/* Game list */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {filteredGames.map((game) => (
+          {filteredGames.map((game, index) => (
             <Link 
               key={game.id} 
               href={`/games/${game.id}`}
@@ -127,10 +128,14 @@ export default function GamesPage() {
             >
               <div className="relative overflow-hidden rounded-lg group hover:scale-105 transition-all duration-300">
                 <div className="aspect-[4/3] bg-gray-800 overflow-hidden">
-                  <img 
-                    src={game.imageUrl} 
-                    alt={game.title} 
+                  <Image 
+                    src={game.imageUrl}
+                    alt={game.title}
+                    width={400}
+                    height={300}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    priority={index < 4}
+                    unoptimized={process.env.NODE_ENV === 'development'}
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end">
