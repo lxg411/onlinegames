@@ -47,7 +47,7 @@ function SearchResultsContent() {
                     width={400}
                     height={300}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    unoptimized={true}
+                    unoptimized={process.env.NODE_ENV === 'development'}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end px-4 py-3">
                     <div>

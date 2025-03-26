@@ -111,7 +111,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
                       height={300}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       priority={index < 4}
-                      unoptimized={true}
+                      unoptimized={process.env.NODE_ENV === 'development'}
                     />
                   </div>
                   <div className="p-4">

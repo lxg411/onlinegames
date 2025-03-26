@@ -119,7 +119,7 @@ export default function Home() {
                       height={300}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       priority={index < 4}
-                      unoptimized={true}
+                      unoptimized={process.env.NODE_ENV === 'development'}
                     />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end">
@@ -178,7 +178,7 @@ export default function Home() {
                     width={400}
                     height={300}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    unoptimized={true}
+                    unoptimized={process.env.NODE_ENV === 'development'}
                   />
                 </div>
                 <div className="p-3 bg-gray-800">

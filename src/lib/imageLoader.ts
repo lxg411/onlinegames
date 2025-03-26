@@ -1,5 +1,8 @@
 import { ImageLoaderProps } from 'next/image';
 
+// 检查是否在本地开发环境
+const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+
 // 定义图片加载处理函数
 export default function customImageLoader({ src, width, quality }: ImageLoaderProps): string {
   // 用于调试图片加载问题
@@ -7,6 +10,11 @@ export default function customImageLoader({ src, width, quality }: ImageLoaderPr
   
   // 如果是完整URL（以http开头），直接返回
   if (src.startsWith('http')) {
+    return src;
+  }
+  
+  // 如果是本地开发环境，使用相对路径
+  if (isDevelopment) {
     return src;
   }
   
@@ -37,6 +45,11 @@ export default function customImageLoader({ src, width, quality }: ImageLoaderPr
 export function getFullImageUrl(relativePath: string): string {
   // 如果已经是完整URL，直接返回
   if (relativePath.startsWith('http')) {
+    return relativePath;
+  }
+  
+  // 在开发环境下返回相对路径
+  if (isDevelopment) {
     return relativePath;
   }
   

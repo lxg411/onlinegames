@@ -628,10 +628,19 @@ export const validateGameUrls = () => {
 
 // Get valid games data
 export function getValidGames(): Game[] {
-  return games.map(game => ({
-    ...game,
-    imageUrl: game.imageUrl.startsWith('http') 
-      ? game.imageUrl 
-      : `https://onlinegames-rho.vercel.app${game.imageUrl}`
-  }));
+  // 检查是否在本地开发环境
+  const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+
+  return games.map(game => {
+    // 如果已经是绝对URL，或者是在开发环境中，保持原样
+    if (game.imageUrl.startsWith('http') || isDevelopment) {
+      return game;
+    }
+    
+    // 生产环境中，为相对路径添加基础URL
+    return {
+      ...game,
+      imageUrl: `https://onlinegames-rho.vercel.app${game.imageUrl}`
+    };
+  });
 } 

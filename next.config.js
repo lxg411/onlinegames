@@ -19,7 +19,8 @@ const nextConfig = {
         hostname: '**',
       }
     ],
-    unoptimized: true, // 全局禁用图片优化，确保所有环境下图片都能显示
+    // 只在开发环境中禁用图片优化
+    unoptimized: process.env.NODE_ENV === 'development',
     // 显著提高生产环境图片处理的容忍度
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
