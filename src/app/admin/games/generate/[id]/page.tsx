@@ -11,10 +11,9 @@ interface GeneratePageProps {
   params: {
     id: string;
   };
-  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default function GeneratePage({ params, searchParams }: GeneratePageProps) {
+export default function GeneratePage({ params }: GeneratePageProps) {
   const gameId = params.id;
   const [gameData, setGameData] = useState<GameData | null>(null);
   const [loading, setLoading] = useState(true);
