@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Online Games - Free Game Portal",
-  description: "Play the best free online games on onlinegames.io. We offer a wide selection of browser games for the whole family.",
+  title: "Online Games | Free Browser Games",
+  description: "Play a wide selection of free online games directly in your browser. No downloads, no sign-ups, just instant fun!",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -40,11 +40,7 @@ export default function RootLayout({
             gtag('config', 'G-1M1TFEBGXJ');
           `}
         </Script>
-        <div className="flex-grow">
-          <main className="container mx-auto px-4 py-8">
-            {children}
-          </main>
-        </div>
+        <main className="flex-grow">{children}</main>
         <Footer />
       </body>
     </html>
