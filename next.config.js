@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
     domains: [
       'img.gamedistribution.com', 
@@ -8,7 +9,9 @@ const nextConfig = {
       'picsum.photos',
       'images.unsplash.com',
       'via.placeholder.com',
-      'placehold.co'
+      'placehold.co',
+      'onlinegames-rho.vercel.app',
+      'vercel.app'
     ],
     remotePatterns: [
       {
@@ -16,7 +19,7 @@ const nextConfig = {
         hostname: '**',
       }
     ],
-    unoptimized: process.env.NODE_ENV === 'development',
+    unoptimized: true, // 全局禁用图片优化，确保所有环境下图片都能显示
     // 显著提高生产环境图片处理的容忍度
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
@@ -36,7 +39,6 @@ const nextConfig = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
-  optimizeFonts: true,
   experimental: {
   },
 };

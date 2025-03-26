@@ -24,7 +24,6 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="next-image-loader" content="custom" />
       </head>
       <body className={`${inter.variable} antialiased min-h-screen flex flex-col`}>
         <main className="flex-grow">{children}</main>
@@ -34,6 +33,4 @@ export default function RootLayout({
   );
 }
 
-export const images = {
-  loader: customImageLoader
-};
+// 直接使用next.config.js中的配置，不在这里重复定义

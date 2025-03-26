@@ -1,3 +1,5 @@
+import { getFullImageUrl } from '@/lib/imageLoader';
+
 export interface Game {
   id: string;
   title: string;
@@ -625,9 +627,11 @@ export const validateGameUrls = () => {
 };
 
 // Get valid games data
-export const getValidGames = () => {
-  return games.filter(game => 
-    Boolean(game.url && (game.url.startsWith('http') || game.url.startsWith('/games/iframe'))) &&
-    Boolean(game.imageUrl && game.imageUrl.startsWith('/'))
-  );
-}; 
+export function getValidGames(): Game[] {
+  return games.map(game => ({
+    ...game,
+    imageUrl: game.imageUrl.startsWith('http') 
+      ? game.imageUrl 
+      : `https://onlinegames-rho.vercel.app${game.imageUrl}`
+  }));
+} 
