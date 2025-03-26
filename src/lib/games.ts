@@ -16,7 +16,7 @@ export const games: Game[] = [
     id: 'red-and-green-2',
     title: 'Red and Green 2',
     description: 'Join the adorable red and green creatures in this exciting sequel! Red and Green 2 brings more challenging levels, new abilities, and colorful puzzles to solve. Control these cute alien-like characters as they work together to overcome obstacles, avoid traps, and reunite after being separated. With improved graphics, intuitive controls, and clever level design, this action-packed adventure will test your problem-solving skills and coordination. Help the red and green friends navigate through an alien world filled with surprises and fun challenges!',
-    imageUrl: '/images/games/uploads/Red-and-Green-2.jpg',
+    imageUrl: '/images/games/uploads/Red-and-Green-2.webp',
     categories: ['Action', 'Puzzle', 'Adventure'],
     rating: 4.7,
     playCount: 237450,
