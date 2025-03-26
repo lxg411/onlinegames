@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { games } from '../../../lib/games';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 
 export function generateStaticParams() {
   // Get all unique categories
@@ -102,11 +103,13 @@ export default function CategoryPage({ params }: { params: { category: string } 
             {filteredGames.map(game => (
               <Link href={`/games/${game.id}`} key={game.id}>
                 <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-amber-500/20 transition-all cursor-pointer hover:scale-[1.02]">
-                  <div className="h-40 bg-gray-700 relative overflow-hidden">
-                    <img 
+                  <div className="relative h-40 rounded-t-lg overflow-hidden">
+                    <Image 
                       src={game.imageUrl} 
                       alt={game.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 384px"
                     />
                     <div className="absolute top-2 right-2">
                       <div className="bg-black/70 rounded-full px-2 py-1 text-xs flex items-center">
@@ -138,7 +141,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
             <h2 className="text-xl font-bold mb-4">About {category} Games</h2>
             <p className="text-gray-400 mb-4">
               {category} games are a popular genre among online gamers. These games offer exciting gameplay and challenges that keep players coming back for more. 
-              Whether you're a casual player or a dedicated gamer, our collection of {category.toLowerCase()} games offers something for everyone.
+              Whether you&apos;re a casual player or a dedicated gamer, our collection of {category.toLowerCase()} games offers something for everyone.
             </p>
             <p className="text-gray-400">
               All games on OnlineGames.wiki can be played instantly in your browser without downloads or installations. 

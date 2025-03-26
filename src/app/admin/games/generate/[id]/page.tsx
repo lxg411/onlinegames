@@ -11,6 +11,9 @@ interface GeneratePageProps {
   params: {
     id: string;
   };
+  searchParams?: {
+    [key: string]: string | string[] | undefined;
+  };
 }
 
 export default function GeneratePage({ params }: GeneratePageProps) {
@@ -223,6 +226,12 @@ export default function ${capitalizeFirstLetter(game.id).replace(/-([a-z])/g, (g
     setTimeout(() => setCreateSuccess(false), 3000);
   };
 
+  useEffect(() => {
+    if (gameData) {
+      generatePageCode(gameData);
+    }
+  }, [gameData, generatePageCode]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -237,7 +246,7 @@ export default function ${capitalizeFirstLetter(game.id).replace(/-([a-z])/g, (g
         <div className="text-center">
           <h3 className="text-lg font-medium text-gray-900">Game Not Found</h3>
           <p className="mt-2 text-sm text-gray-500">
-            No game found with ID "${gameId}". Please check if the game ID is correct.
+            No game found with ID &quot;{gameId}&quot;. Please check if the game ID is correct.
           </p>
         </div>
       </div>

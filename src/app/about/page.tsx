@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AboutPage() {
   return (
@@ -80,7 +81,7 @@ export default function AboutPage() {
             <p className="text-gray-300">
               We continuously work to expand our game library, improve our platform, and create the best possible 
               experience for our users. Our team is dedicated to finding and featuring the most engaging online games, 
-              ensuring that there's always something new and exciting to discover.
+              ensuring that there&apos;s always something new and exciting to discover.
             </p>
           </div>
           
@@ -88,8 +89,14 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold mb-6">Meet Our Team</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-32 h-32 rounded-full bg-gray-700 mx-auto mb-4 overflow-hidden">
-                  <img src="https://picsum.photos/200/200?random=1" alt="Team Member" className="w-full h-full object-cover" />
+                <div className="w-32 h-32 rounded-full bg-gray-700 mx-auto mb-4 overflow-hidden relative">
+                  <Image 
+                    src="https://picsum.photos/200/200?random=1" 
+                    alt="Team Member" 
+                    className="object-cover" 
+                    fill
+                    sizes="(max-width: 768px) 100vw, 128px"
+                  />
                 </div>
                 <h3 className="text-xl font-bold">Alex Johnson</h3>
                 <p className="text-amber-500">Founder & CEO</p>
@@ -97,8 +104,14 @@ export default function AboutPage() {
               </div>
               
               <div className="text-center">
-                <div className="w-32 h-32 rounded-full bg-gray-700 mx-auto mb-4 overflow-hidden">
-                  <img src="https://picsum.photos/200/200?random=2" alt="Team Member" className="w-full h-full object-cover" />
+                <div className="w-32 h-32 rounded-full bg-gray-700 mx-auto mb-4 overflow-hidden relative">
+                  <Image 
+                    src="https://picsum.photos/200/200?random=2" 
+                    alt="Team Member" 
+                    className="object-cover" 
+                    fill
+                    sizes="(max-width: 768px) 100vw, 128px"
+                  />
                 </div>
                 <h3 className="text-xl font-bold">Sarah Chen</h3>
                 <p className="text-amber-500">Game Curator</p>
@@ -106,8 +119,14 @@ export default function AboutPage() {
               </div>
               
               <div className="text-center">
-                <div className="w-32 h-32 rounded-full bg-gray-700 mx-auto mb-4 overflow-hidden">
-                  <img src="https://picsum.photos/200/200?random=3" alt="Team Member" className="w-full h-full object-cover" />
+                <div className="w-32 h-32 rounded-full bg-gray-700 mx-auto mb-4 overflow-hidden relative">
+                  <Image 
+                    src="https://picsum.photos/200/200?random=3" 
+                    alt="Team Member" 
+                    className="object-cover" 
+                    fill
+                    sizes="(max-width: 768px) 100vw, 128px"
+                  />
                 </div>
                 <h3 className="text-xl font-bold">Michael Rodriguez</h3>
                 <p className="text-amber-500">Lead Developer</p>
@@ -119,7 +138,7 @@ export default function AboutPage() {
           <div className="bg-gray-800 rounded-lg p-8">
             <h2 className="text-2xl font-bold mb-6">Contact Us</h2>
             <p className="text-gray-300 mb-6">
-              Have questions, suggestions, or feedback? We'd love to hear from you! Get in touch with our team 
+              Have questions, suggestions, or feedback? We&apos;d love to hear from you! Get in touch with our team 
               using any of the methods below:
             </p>
             

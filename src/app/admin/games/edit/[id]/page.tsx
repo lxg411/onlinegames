@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { games, Game } from '../../../../../lib/games';
-import GameEmbed from '../../../../../components/GameEmbed';
 
 interface GameData extends Omit<Game, 'url'> {
   gameUrl: string;
@@ -36,7 +35,6 @@ export default function EditGame() {
   const [previewMode, setPreviewMode] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [imagePreview, setImagePreview] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [gameNotFound, setGameNotFound] = useState(false);
@@ -230,7 +228,7 @@ export default function EditGame() {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-gray-900 mb-4">Game not found</h1>
-          <p className="text-gray-600 mb-6">Cannot find game with ID "{gameId}".</p>
+          <p className="text-gray-600 mb-6">Cannot find game with ID &quot;{gameId}&quot;.</p>
           <Link 
             href="/admin" 
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-500 hover:bg-amber-600"

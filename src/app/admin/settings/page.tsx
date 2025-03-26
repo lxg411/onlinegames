@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface SiteSettings {
   siteName: string;
@@ -52,25 +52,6 @@ export default function SettingsPage() {
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
               type === 'number' ? parseInt(value) : value
     });
-  };
-
-  // Handle image type checkbox changes
-  const handleImageTypeChange = (type: string) => {
-    const currentTypes = [...settings.acceptedImageTypes];
-    
-    if (currentTypes.includes(type)) {
-      // If already selected, remove it
-      setSettings({
-        ...settings,
-        acceptedImageTypes: currentTypes.filter(t => t !== type)
-      });
-    } else {
-      // If not selected, add it
-      setSettings({
-        ...settings,
-        acceptedImageTypes: [...currentTypes, type]
-      });
-    }
   };
 
   // Save settings
