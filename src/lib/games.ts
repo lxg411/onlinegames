@@ -16,7 +16,7 @@ export const games: Game[] = [
     id: 'red-and-green-2',
     title: 'Red and Green 2',
     description: 'Join the adorable red and green creatures in this exciting sequel! Red and Green 2 brings more challenging levels, new abilities, and colorful puzzles to solve. Control these cute alien-like characters as they work together to overcome obstacles, avoid traps, and reunite after being separated. With improved graphics, intuitive controls, and clever level design, this action-packed adventure will test your problem-solving skills and coordination. Help the red and green friends navigate through an alien world filled with surprises and fun challenges!',
-    imageUrl: '/images/games/uploads/red-and-green-2.jpg',
+    imageUrl: '/images/games/uploads/Red-and-Green-2.jpg',
     categories: ['Action', 'Puzzle', 'Adventure'],
     rating: 4.7,
     playCount: 237450,
@@ -336,7 +336,7 @@ export const games: Game[] = [
     id: 'drift-king',
     title: 'Drift King',
     description: 'Become the ultimate drift master in this high-octane racing experience. Master the art of controlled sliding through challenging tracks, earn points for style and precision, and unlock new vehicles and customization options. With realistic physics, detailed car handling mechanics, and various track environments, Drift King delivers an authentic drifting experience that will satisfy both casual players and hardcore racing enthusiasts.',
-    imageUrl: '/images/games/uploads/drift-king.jpg',
+    imageUrl: '/images/games/uploads/Drift-King.jpg',
     categories: ['Racing', 'Drift', 'Sports'],
     rating: 4.9,
     playCount: 342870,
@@ -661,16 +661,22 @@ export function getGameImageUrl(relativePath: string): string {
     return relativePath;
   }
   
-  // 标准化路径
-  const normalizedPath = relativePath.startsWith('/') 
-    ? relativePath 
-    : `/${relativePath}`;
+  // 处理文件名大小写问题
+  const fileName = relativePath.split('/').pop() || '';
+  const directory = relativePath.substring(0, relativePath.lastIndexOf('/') + 1);
+  
+  // 将第一个字母大写，其余保持不变
+  const correctedFileName = fileName.split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('-');
+  
+  const correctedPath = directory + correctedFileName;
   
   // 本地开发环境使用相对路径
   if (isDevelopment) {
-    return normalizedPath;
+    return correctedPath;
   }
   
   // 生产环境使用完整URL
-  return `https://onlinegames-rho.vercel.app${normalizedPath}`;
+  return `https://onlinegames-rho.vercel.app${correctedPath}`;
 } 

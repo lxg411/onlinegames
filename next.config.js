@@ -12,7 +12,7 @@ const nextConfig = {
       'placehold.co',
       'onlinegames-rho.vercel.app',
       'vercel.app',
-      'localhost'  // 允许本地主机图片
+      'localhost'
     ],
     remotePatterns: [
       {
@@ -24,15 +24,15 @@ const nextConfig = {
         hostname: '**',
       }
     ],
-    // 仅在开发环境禁用优化
-    unoptimized: process.env.NODE_ENV === 'development',
-    // 显著提高生产环境图片处理的容忍度
+    // 在生产环境中禁用图片优化，以避免路径问题
+    unoptimized: true,
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     minimumCacheTTL: 60,
-    formats: ['image/webp'],
-    path: '/_next/image'
+    formats: ['image/webp', 'image/jpeg', 'image/png'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   eslint: {
     // Warning: This allows production builds to successfully complete even if
