@@ -1,0 +1,2106 @@
+import React from 'react';
+import Link from 'next/link';
+import { games } from '@/lib/games';
+import type { Game } from '@/lib/games';
+import StarRating from '@/components/StarRating';
+import GameEmbed from '@/components/GameEmbed';
+import { notFound } from 'next/navigation';
+
+interface GameParams {
+  id: string;
+}
+
+// Game detail page
+export default function GamePage({ params }: { params: GameParams }) {
+  const gameId = params.id;
+  const gameData = games.find(g => g.id === gameId);
+  
+  // If the game is not found, show not found message
+  if (!gameData) {
+    return notFound();
+  }
+  
+  // Function to get game tips based on categories
+  const getGameTips = (categories: string[]) => {
+    // 针对特定游戏的规则与提示
+    // 根据游戏ID提供特定内容
+    if (gameId === '4-winds') {
+      return {
+        issues: [
+          "点击卡片将其翻转",
+          "寻找相同的皇家卡片",
+          "如果两张翻开的卡片匹配，它们会保持正面朝上",
+          "如果匹配了所有卡片，你就赢了！",
+          "在时间耗尽前完成关卡获得更多分数"
+        ],
+        scoring: [
+          "基本配对: 10分",
+          "连续快速配对: 额外奖励分",
+          "关卡完成: 时间奖励",
+          "特殊皇家卡片配对: 额外分数"
+        ],
+        tips: [
+          "尝试记住翻开卡片的位置",
+          "一次专注于相邻的一个区域",
+          "先寻找特殊卡片 - 它们通常有额外加成",
+          "为困难级别保留道具",
+          "尝试快速完成关卡以获得时间奖励",
+          "定期练习可以提高你的观察记忆力"
+        ]
+      };
+    }
+    else if (gameId === 'illustrations-3') {
+      return {
+        issues: [
+          "寻找两幅图之间的细微差别",
+          "仔细观察每个区域的细节变化",
+          "有限的提示次数可用",
+          "时间限制会增加挑战难度",
+          "每个关卡的差异数量不同"
+        ],
+        scoring: [
+          "发现差异: 每个差异得分",
+          "快速发现: 时间奖励",
+          "不使用提示: 额外加分",
+          "全部发现: 完成奖励",
+          "连续发现: 连击奖励"
+        ],
+        tips: [
+          "系统性地扫描整个图像",
+          "对比相同区域的颜色和形状",
+          "放大检查细节丰富的区域",
+          "边缘和角落通常隐藏着差异",
+          "仔细检查文字和数字",
+          "如果你卡住了，使用提示后重新专注"
+        ]
+      };
+    }
+    else if (gameId === 'bubble-shooter') {
+      return {
+        issues: [
+          "射击泡泡匹配三个或更多相同颜色",
+          "当泡泡触及底部时游戏结束",
+          "角度计算对成功至关重要",
+          "某些关卡有特殊泡泡和障碍物",
+          "时间限制增加了挑战性"
+        ],
+        scoring: [
+          "基础消除: 每组匹配的泡泡得分",
+          "连锁反应: 一次射击触发多次消除得额外分",
+          "大群消除: 一次消除更多泡泡得更高分",
+          "特殊泡泡: 触发特殊效果得额外奖励",
+          "关卡完成: 清空所有泡泡得完成奖励"
+        ],
+        tips: [
+          "瞄准形成群组的边缘",
+          "利用墙壁反弹创造困难角度",
+          "优先消除孤立的泡泡群",
+          "计划连锁反应以最大化得分",
+          "密切关注下一个泡泡颜色",
+          "在困难局面保存特殊泡泡"
+        ]
+      };
+    }
+    else if (gameId === 'connect-the-bubbles') {
+      return {
+        issues: [
+          "连接相同颜色的泡泡",
+          "连接路径不能交叉",
+          "有些关卡有障碍物阻挡路径",
+          "有限的移动次数增加了策略需求",
+          "特殊泡泡需要特殊连接方式"
+        ],
+        scoring: [
+          "基础连接: 每对连接的泡泡得分",
+          "长连接: 连接距离远的泡泡得额外分",
+          "多重连接: 连续快速连接得分倍增",
+          "全部清除: 清除所有泡泡得额外奖励",
+          "剩余移动次数: 高效连接得额外分数"
+        ],
+        tips: [
+          "优先连接可能被阻挡的泡泡",
+          "从边缘开始连接",
+          "规划路径避免创造无法连接的孤立泡泡",
+          "尽量保持游戏区域的开放性",
+          "观察整个区域寻找最佳连接机会",
+          "有策略地使用特殊道具解决难题"
+        ]
+      };
+    }
+    else if (gameId === 'daily-2-queens') {
+      return {
+        issues: [
+          "皇后不能互相攻击（同行、列或对角线）",
+          "每天有两个新的挑战谜题",
+          "难度逐渐增加",
+          "某些布局有特殊限制条件",
+          "需要理解国际象棋皇后的移动规则"
+        ],
+        scoring: [
+          "基本解题: 成功放置皇后得分",
+          "解题时间: 快速解题得额外分",
+          "连续解题: 每天坚持挑战得连续奖励",
+          "不使用提示: 独立解题得额外分数",
+          "完成挑战: 特殊布局额外奖励"
+        ],
+        tips: [
+          "先确定皇后不能放置的位置",
+          "利用棋盘限制条件缩小选择范围",
+          "检查每一行、列和对角线的攻击路径",
+          "从最受限制的位置开始放置",
+          "掌握常见的皇后互不攻击模式",
+          "每天练习提高解题速度和准确度"
+        ]
+      };
+    }
+    else if (gameId === 'jewels-of-the-medici') {
+      return {
+        issues: [
+          "交换相邻宝石创建三个或更多的匹配",
+          "某些关卡有特殊目标和限制",
+          "特殊宝石具有强大的清除能力",
+          "有限的移动次数要求策略性思考",
+          "障碍物需要特定方式移除"
+        ],
+        scoring: [
+          "基础匹配: 每组三个宝石得分",
+          "大型匹配: 四个或更多宝石得额外分",
+          "连锁反应: 一次移动触发多次匹配得倍数分",
+          "特殊宝石: 创建和使用特殊宝石得高分",
+          "目标完成: 达成关卡目标得完成奖励"
+        ],
+        tips: [
+          "专注创建特殊宝石",
+          "优先清除障碍物",
+          "寻找可能的连锁反应",
+          "优先满足关卡特定目标",
+          "保存特殊宝石组合用于困难局面",
+          "观察整个游戏区域寻找最佳匹配"
+        ]
+      };
+    }
+    else if (gameId === 'ninja-breakout') {
+      return {
+        issues: [
+          "控制挡板反弹球击破砖块",
+          "不要让球掉出屏幕底部",
+          "某些砖块需要多次击中",
+          "收集掉落的能力提升",
+          "忍者主题特殊能力需要战略使用"
+        ],
+        scoring: [
+          "砖块破坏: 每个砖块得分",
+          "连击: 不失去球的连续击破得倍数分",
+          "特殊砖块: 破坏特殊砖块得额外分",
+          "关卡完成: 清除所有砖块得完成奖励",
+          "速度奖励: 快速完成关卡得时间分数"
+        ],
+        tips: [
+          "控制反弹角度击打特定位置",
+          "留意球的路径预判反弹方向",
+          "优先收集有用的能力提升",
+          "尝试同时保持多个球在场上",
+          "专注于清除通路到达难以触及的砖块",
+          "利用侧壁创造有利的反弹角度"
+        ]
+      };
+    }
+    else if (gameId === 'find-the-odd-one-out') {
+      return {
+        issues: [
+          "在一组相似物品中找出不同的一个",
+          "差异可能在颜色、形状、大小或细节上",
+          "时间限制增加挑战难度",
+          "随着关卡进展差异变得更加隐蔽",
+          "需要敏锐的观察力和注意力"
+        ],
+        scoring: [
+          "基础识别: 每次正确找出不同项得分",
+          "速度奖励: 快速识别得额外时间分数",
+          "连续正确: 不出错的连续识别得倍数分",
+          "关卡完成: 完成一组挑战得进阶奖励",
+          "准确率: 高准确率得额外奖励"
+        ],
+        tips: [
+          "系统性地扫描所有物品",
+          "比较相同特征(颜色、形状、朝向)",
+          "不要急于做出选择",
+          "使用排除法缩小范围",
+          "培养寻找模式中断的能力",
+          "练习快速识别共性和差异"
+        ]
+      };
+    }
+    else if (gameId === 'monkey-connect') {
+      return {
+        issues: [
+          "连接相同的猴子图案",
+          "连接线不能有超过两个转弯",
+          "有时间限制增加挑战性",
+          "布局越来越复杂",
+          "需要快速识别和连接能力"
+        ],
+        scoring: [
+          "基础连接: 每对匹配图案得分",
+          "快速连接: 快速找到匹配得时间奖励",
+          "连续连接: 不间断连接得连击分数",
+          "关卡完成: 清除所有图案得完成奖励",
+          "特殊图案: 连接特殊猴子图案得额外分"
+        ],
+        tips: [
+          "先连接最容易被阻塞的图案",
+          "寻找边缘的匹配对",
+          "记住可用的连接路径转弯限制",
+          "观察整个游戏区域再做决策",
+          "优先清除造成阻塞的图案",
+          "训练快速识别相同图案的能力"
+        ]
+      };
+    }
+    else if (gameId === 'balloon-maze') {
+      return {
+        issues: [
+          "引导角色穿过迷宫收集所有气球",
+          "避开障碍物和陷阱",
+          "有些气球需要特定路径才能到达",
+          "时间限制增加挑战难度",
+          "需要规划最佳路线"
+        ],
+        scoring: [
+          "气球收集: 每个气球得分",
+          "时间效率: 快速完成得时间奖励",
+          "完美路径: 走最短路径得额外分",
+          "无失误: 不碰障碍物得完美奖励",
+          "全部收集: 收集所有气球得完成奖励"
+        ],
+        tips: [
+          "先观察整个迷宫结构",
+          "规划收集所有气球的路径",
+          "优先收集难以到达的气球",
+          "记住已经探索过的路径",
+          "寻找捷径和隐藏通道",
+          "耐心处理复杂区域"
+        ]
+      };
+    }
+    else if (gameId === 'mystical-forest') {
+      return {
+        issues: [
+          "Tiles may be blocked by surrounding tiles",
+          "Limited time in challenge modes adds pressure",
+          "Forest-themed layouts can create complex patterns",
+          "Some magical tiles have special matching rules",
+          "Puzzles become increasingly difficult as you progress"
+        ],
+        scoring: [
+          "Matched pairs: Points for each successful match",
+          "Quick matching: Time bonuses for fast play",
+          "Combo chains: Multipliers for consecutive matches",
+          "Forest items: Special points for themed tile pairs",
+          "Level completion: Major bonus for clearing all tiles"
+        ],
+        tips: [
+          "Focus on freeing edge tiles first",
+          "Look for matching pairs that will unblock the most tiles",
+          "Pay attention to tile layers and prioritize upper layers",
+          "Use hints strategically when you're completely stuck",
+          "Try to keep multiple options open rather than clearing one section",
+          "Remember the positions of previously seen tiles"
+        ]
+      };
+    }
+    else if (gameId === 'sudoku-classic') {
+      return {
+        issues: [
+          "Each row, column, and 3x3 box must contain numbers 1-9",
+          "No repeating numbers allowed in rows, columns, or boxes",
+          "Difficulty increases with fewer pre-filled numbers",
+          "Some puzzles may have multiple solution paths",
+          "Time pressure in challenge modes adds complexity"
+        ],
+        scoring: [
+          "Completion time: Faster solutions earn more points",
+          "Difficulty level: Higher difficulties award more points",
+          "Hint usage: Penalties for using hints",
+          "Error-free solving: Perfect solution bonuses",
+          "Daily challenges: Special point multipliers"
+        ],
+        tips: [
+          "Use pencil marks to track possible numbers for each cell",
+          "Look for cells with the fewest possible numbers",
+          "Check for 'naked pairs' where two cells must contain the same numbers",
+          "Use the 'scanning' technique to eliminate possibilities",
+          "Work with intersection points between rows, columns and boxes",
+          "When stuck, try looking at the puzzle from a different perspective"
+        ]
+      };
+    }
+    else if (gameId === 'spades-spider-solitaire') {
+      return {
+        issues: [
+          "All cards must be arranged in descending order",
+          "Limited card movement can create challenging situations",
+          "Using all available moves efficiently is crucial",
+          "Higher difficulty levels have multiple decks",
+          "Some layouts may become unsolvable without proper planning"
+        ],
+        scoring: [
+          "Card movements: Points for each successful placement",
+          "Sequence completion: Bonuses for removing complete sequences",
+          "Time efficiency: Faster completion earns more points",
+          "Move efficiency: Fewer moves results in higher scores",
+          "Game completion: Major bonus for clearing the entire board"
+        ],
+        tips: [
+          "Always try to expose hidden cards as soon as possible",
+          "Create empty columns when you can for strategic card movement",
+          "Move entire sequences when possible instead of single cards",
+          "Plan several moves ahead rather than just the immediate play",
+          "Be strategic with the stock pile - only use when necessary",
+          "Focus on building long sequences to maximize clearing potential"
+        ]
+      };
+    }
+    else if (gameId === 'candy-mahjong') {
+      return {
+        issues: [
+          "Candy tiles may be visually similar, requiring close attention",
+          "Some tiles can only be matched when they're free on at least one side",
+          "Complex arrangements create challenging puzzles",
+          "Limited hints available per level",
+          "Time pressure in challenge modes tests quick recognition"
+        ],
+        scoring: [
+          "Matched pairs: Base points for each match",
+          "Special candy tiles: Bonus points for special matches",
+          "Quick matches: Time bonuses for rapid matching",
+          "Consecutive matches: Combo multipliers",
+          "Level completion: Substantial bonus for clearing all tiles"
+        ],
+        tips: [
+          "Scan the board methodically to identify free tiles",
+          "Focus on eliminating tiles that block many others",
+          "Look for matching pairs on the edges and top layer first",
+          "Use hints strategically when you're completely stuck",
+          "Try to memorize the positions of similar tiles",
+          "Work from the outside in to gradually clear the board"
+        ]
+      };
+    }
+    else if (gameId === 'wild-west-klondike') {
+      return {
+        issues: [
+          "Cards must be built in foundation piles by suit from Ace to King",
+          "Tableau columns must be arranged in descending order with alternating colors",
+          "Limited access to stock pile cards can create challenging situations",
+          "Some game configurations may become difficult to solve",
+          "Strategic planning is essential for higher difficulty levels"
+        ],
+        scoring: [
+          "Card movement: Points for each successful card placement",
+          "Foundation completion: Major bonus for completing suit sequences",
+          "Time efficiency: Faster play earns time bonuses",
+          "Stock pile usage: Efficient use of the stock pile increases score",
+          "Game completion: Substantial bonus for completing the game"
+        ],
+        tips: [
+          "Always try to reveal face-down cards in the tableau",
+          "Focus on moving cards to foundations when it doesn't block progress",
+          "Create empty columns when possible for Kings",
+          "Consider all possible moves before using the stock pile",
+          "Look for opportunities to build long sequences",
+          "Balance moving cards to foundations versus building tableau sequences"
+        ]
+      };
+    }
+    else if (gameId === 'pyramid-solitaire-ancient-china') {
+      return {
+        issues: [
+          "Cards must sum to 13 to be removed (J=11, Q=12, K=13)",
+          "Only exposed cards at the bottom of the pyramid can be selected",
+          "Stock pile cards provide additional matching options",
+          "Strategic removal is essential to reach blocked cards",
+          "Some layouts may become unsolvable without proper planning"
+        ],
+        scoring: [
+          "Card removal: Points for each pair removed",
+          "Special cards: Bonus points for removing royal cards",
+          "Combo chains: Consecutive successful removals multiply points",
+          "Time efficiency: Faster completion earns time bonuses",
+          "Complete clearance: Major bonus for removing the entire pyramid"
+        ],
+        tips: [
+          "Always check for Kings first, as they can be removed individually",
+          "Prioritize removing cards that unblock the most cards above",
+          "Use the stock pile strategically to create new matching opportunities",
+          "Plan ahead to avoid leaving single cards with no possible matches",
+          "When possible, save stock pile cards for difficult situations",
+          "Focus on clearing the bottom rows first to expose more options"
+        ]
+      };
+    }
+    else if (gameId === 'montana-solitaire') {
+      return {
+        issues: [
+          "Cards must be arranged from 2 to King in each column",
+          "Limited card movement creates challenging situations",
+          "Planning several moves ahead is essential",
+          "Some configurations may become difficult to solve",
+          "Strategic gap management is crucial for success"
+        ],
+        scoring: [
+          "Card placement: Points for each correct placement",
+          "Column completion: Bonus for completing a full column",
+          "Time efficiency: Faster solutions earn more points",
+          "Move efficiency: Fewer moves results in higher scores",
+          "Game completion: Major bonus for completing all columns"
+        ],
+        tips: [
+          "Focus on creating spaces in strategic positions",
+          "Plan multi-card movements carefully",
+          "Try to free up cards that can fill in partial sequences",
+          "Look for opportunities to move entire sequences at once",
+          "Pay attention to suits when planning moves",
+          "Sometimes moving cards temporarily out of sequence helps"
+        ]
+      };
+    }
+    else if (gameId === 'flower-world-2') {
+      return {
+        issues: [
+          "Match three or more identical flowers to remove them",
+          "Special obstacles require specific strategies to clear",
+          "Limited moves in each level require efficient planning",
+          "Some levels have unique objectives beyond simple matching",
+          "Time limits in challenge modes add pressure"
+        ],
+        scoring: [
+          "Basic matches: Points for each standard match-3",
+          "Larger matches: Extra points for matching 4+ flowers",
+          "Special flowers: Bonus points for creating and using special flowers",
+          "Combo chains: Cascading matches multiply points",
+          "Objective completion: Major bonus for meeting level goals"
+        ],
+        tips: [
+          "Focus on creating special flowers when possible",
+          "Prioritize clearing obstacles and blockers first",
+          "Look for potential cascade opportunities",
+          "Plan several moves ahead rather than making immediate matches",
+          "Save powerful flower combinations for difficult situations",
+          "Always check the level objectives before planning your strategy"
+        ]
+      };
+    }
+    else if (gameId === 'abc-tiles') {
+      return {
+        issues: [
+          "Match three identical letter tiles to remove them",
+          "Limited board space requires strategic thinking",
+          "New tiles appear as others are removed",
+          "Word formation adds complexity to matching strategy",
+          "Special tiles have unique properties and rules"
+        ],
+        scoring: [
+          "Basic matches: Points for matching three identical letters",
+          "Word formation: Bonus points for forming words",
+          "Longer words: Higher points for longer word creations",
+          "Special tiles: Extra points for matching special tiles",
+          "Combo chains: Consecutive matches multiply points"
+        ],
+        tips: [
+          "Look for immediate matches first before new tiles appear",
+          "Try to form words when possible for bonus points",
+          "Prioritize matching tiles that block other potential matches",
+          "Keep track of letters that appear frequently",
+          "Use special tiles strategically for maximum effect",
+          "Plan ahead to create chain reactions of matches"
+        ]
+      };
+    }
+    else if (gameId === 'aladdin-solitaire') {
+      return {
+        issues: [
+          "Match identical cards to remove them from the board",
+          "Some cards may be partially hidden by others",
+          "Time limits in challenge modes add pressure",
+          "Limited reshuffles available when no matches are possible",
+          "Memory skills are essential for efficient matching"
+        ],
+        scoring: [
+          "Card matches: Points for each pair successfully matched",
+          "Quick matches: Time bonuses for rapid matching",
+          "Consecutive matches: Combo multipliers for match streaks",
+          "Special cards: Bonus points for matching special Arabian-themed cards",
+          "Level completion: Major bonus for clearing all cards"
+        ],
+        tips: [
+          "Try to memorize card positions after viewing them",
+          "Focus on matching cards that unblock others",
+          "Develop a systematic scanning pattern across the board",
+          "Use reshuffles strategically when truly stuck",
+          "Pay special attention to similar-looking cards",
+          "Start with the outermost cards before moving inward"
+        ]
+      };
+    }
+    
+    // For Racing games
+    else if (categories.includes('Racing') || categories.includes('Drift')) {
+      return {
+        issues: [
+          "Difficult turns and tracks require practice",
+          "Vehicle control varies depending on surface conditions",
+          "Some vehicles are locked until you reach certain milestones",
+          "Higher difficulty levels introduce more aggressive AI opponents",
+          "Time-limited challenges may require multiple attempts"
+        ],
+        scoring: [
+          "Race position: Points based on finishing position",
+          "Time completion: Faster times earn more points",
+          "Drift combos: Points for maintaining drift streaks",
+          "Clean racing: Bonus for avoiding collisions",
+          "Special maneuvers: Extra points for stunts and techniques"
+        ],
+        tips: [
+          "Master braking before difficult turns",
+          "Learn each track's layout before attempting time trials",
+          "Customize your vehicle for specific track types",
+          "Use boost/nitro strategically, not just when available",
+          "Practice drifting techniques on easier tracks first",
+          "Watch replays of your best runs to improve technique"
+        ]
+      };
+    }
+    // For Card Games
+    else if (categories.includes('Card Games') || categories.includes('Solitaire')) {
+      return {
+        issues: [
+          "Some card combinations can lead to dead ends",
+          "Time limits may apply in challenge modes",
+          "Advanced levels require strategic planning",
+          "Limited undos available in most game modes",
+          "Certain special cards have unique rules"
+        ],
+        scoring: [
+          "Card placement: Points for each successful placement",
+          "Combo chains: Multipliers for sequential moves",
+          "Time efficiency: Bonuses for quick completion",
+          "Complete clearance: Major bonus for clearing all cards",
+          "Streak bonuses: Additional points for no-hint gameplay"
+        ],
+        tips: [
+          "Always check all possible moves before using hints",
+          "Focus on freeing face-down cards early",
+          "Create empty columns when possible for greater flexibility",
+          "Plan several moves ahead instead of just the immediate play",
+          "Pay attention to card suits and colors for optimal strategy",
+          "Learn specific strategies for different solitaire variants"
+        ]
+      };
+    }
+    // For Puzzle games
+    else if (categories.includes('Puzzle') || categories.includes('Match 3') || categories.includes('Bubble Shooter')) {
+      return {
+        issues: [
+          "Limited moves in many puzzle levels",
+          "Time constraints on timed challenge levels",
+          "Special pieces require specific strategies",
+          "Some puzzles have multiple solution paths",
+          "Difficulty increases rapidly in later levels"
+        ],
+        scoring: [
+          "Match size: Larger matches earn more points",
+          "Combo chains: Cascading matches multiply score",
+          "Special piece creation: Bonus points for special pieces",
+          "Objective completion: Bonuses for meeting level goals",
+          "Remaining moves/time: Extra points for efficiency"
+        ],
+        tips: [
+          "Focus on creating special pieces whenever possible",
+          "Plan several moves ahead for bigger combos",
+          "Prioritize clearing obstacles or blockers early",
+          "Look for pattern opportunities across the entire board",
+          "Save power-ups for difficult situations rather than using immediately",
+          "Study level objectives before making your first move"
+        ]
+      };
+    }
+    // For Mahjong games
+    else if (categories.includes('Mahjong') || categories.includes('Matching')) {
+      return {
+        issues: [
+          "Tiles may be blocked by other tiles",
+          "Some layouts can become unsolvable if wrong moves are made",
+          "Time limits apply in challenge modes",
+          "Limited hints available per level",
+          "Special tiles have unique matching rules"
+        ],
+        scoring: [
+          "Tile matching: Points for each pair matched",
+          "Quick matches: Time bonuses for fast play",
+          "Combo chains: Multipliers for consecutive matches",
+          "Level completion: Major bonus for clearing all tiles",
+          "Hint usage: Penalties for using hints"
+        ],
+        tips: [
+          "Always check for free tiles on the edges first",
+          "Try to keep multiple options open rather than clearing one section completely",
+          "Match identical tiles in higher layers before lower ones",
+          "Look for matching pairs that will unblock the most tiles",
+          "Remember the positions of previously seen tiles",
+          "Use hints strategically when completely stuck"
+        ]
+      };
+    }
+    // For Strategy and Tower Defense games
+    else if (categories.includes('Strategy') || categories.includes('Tower Defense')) {
+      return {
+        issues: [
+          "Resource management is critical for success",
+          "Enemy waves increase in difficulty rapidly",
+          "Tower placement requires careful planning",
+          "Some enemies have resistances to certain tower types",
+          "Special waves and boss enemies need specific strategies"
+        ],
+        scoring: [
+          "Enemies defeated: Base points per enemy",
+          "Resource efficiency: Bonuses for optimal spending",
+          "Life preservation: Points for minimizing damage",
+          "Wave completion time: Speed bonuses",
+          "Special achievements: Bonus objectives per level"
+        ],
+        tips: [
+          "Balance between early defense and economy building",
+          "Focus on strategic chokepoints for tower placement",
+          "Diversify your defenses to handle different enemy types",
+          "Upgrade key towers rather than building many weak ones",
+          "Scout upcoming waves to prepare specific defenses",
+          "Don't spend all resources immediately - save for emergencies"
+        ]
+      };
+    }
+    // For IO and Multiplayer games
+    else if (categories.includes('IO') || categories.includes('Multiplayer')) {
+      return {
+        issues: [
+          "Competition with real players increases difficulty",
+          "Game conditions change dynamically based on other players",
+          "Connection issues may occasionally affect gameplay",
+          "Different strategies needed for different player counts",
+          "Balance between aggression and survival is key"
+        ],
+        scoring: [
+          "Survival time: Points for how long you last",
+          "Eliminations: Score for defeating other players",
+          "Territory control: Points for area dominated",
+          "Resource collection: Score based on items gathered",
+          "Objective completion: Bonuses for meeting game goals"
+        ],
+        tips: [
+          "Observe top players to learn effective strategies",
+          "Start cautiously until you understand the current match dynamics",
+          "Form temporary alliances when beneficial",
+          "Target isolated opponents rather than groups",
+          "Know when to retreat instead of forcing confrontations",
+          "Use the environment and map features to your advantage"
+        ]
+      };
+    }
+    // For Action and Arcade games
+    else if (categories.includes('Action') || categories.includes('Arcade') || categories.includes('Shooting')) {
+      return {
+        issues: [
+          "Fast reflexes required for higher difficulties",
+          "Boss fights need specific strategies and patterns",
+          "Limited lives or continues in classic modes",
+          "Power-ups appear randomly and timing is important",
+          "Combo systems require practice to master"
+        ],
+        scoring: [
+          "Targets hit: Base points per successful hit",
+          "Accuracy percentage: Multiplier for precision",
+          "Combo chains: Bonuses for consecutive actions",
+          "Level completion: Time and performance bonuses",
+          "Special moves: Extra points for advanced techniques"
+        ],
+        tips: [
+          "Focus on learning enemy patterns and spawn points",
+          "Prioritize survival over scoring in difficult sections",
+          "Save special weapons for boss fights or crowds",
+          "Practice movement and dodging separately from attacking",
+          "Take advantage of invincibility frames after taking damage",
+          "Look for environmental hazards that can help eliminate enemies"
+        ]
+      };
+    }
+    // For Sports games
+    else if (categories.includes('Sports') || categories.includes('Basketball')) {
+      return {
+        issues: [
+          "Timing mechanics require practice to master",
+          "Different players have unique stats and abilities",
+          "Advanced moves unlock as you progress",
+          "AI opponents adapt to your playstyle",
+          "Tournament modes increase in difficulty with each match"
+        ],
+        scoring: [
+          "Successful plays: Points for each scoring action",
+          "Style points: Bonuses for spectacular moves",
+          "Win streaks: Multipliers for consecutive victories",
+          "Perfect timing: Extra points for precise execution",
+          "Challenge completion: Rewards for meeting specific goals"
+        ],
+        tips: [
+          "Master the basic controls before attempting advanced moves",
+          "Learn the strengths and weaknesses of each playable character",
+          "Use fakes and timing variations to outsmart opponents",
+          "Study the patterns of AI opponents to predict their actions",
+          "Practice specific scenarios that give you trouble",
+          "Balance offense and defense rather than focusing on one aspect"
+        ]
+      };
+    }
+    // Default game tips for other categories
+    else {
+      return {
+        issues: [
+          "Controls may require some practice to master",
+          "Some levels increase in difficulty quickly",
+          "Watch out for time limits on certain challenges",
+          "Make sure to save your progress regularly",
+          "Special items and power-ups can help in difficult sections"
+        ],
+        scoring: [
+          "Base points: Core gameplay achievements",
+          "Combo multipliers: Consecutive successful actions",
+          "Level completion: Time and performance bonuses",
+          "Collection completeness: Finding all items",
+          "Challenge modes: Special scoring rules"
+        ],
+        tips: [
+          "Start with tutorial levels to learn the basics",
+          "Practice makes perfect - replay levels to improve",
+          "Explore all areas thoroughly for hidden bonuses",
+          "Use power-ups strategically at difficult points",
+          "Learn from failures and adapt your strategy",
+          "Take your time to plan before acting quickly"
+        ]
+      };
+    }
+
+    // Adding rules and tips for the second batch of new games
+    if (gameId === 'music-mahjong') {
+      return {
+        issues: [
+          "Musical tile pairs must be matched to be removed",
+          "Some tiles are blocked by others until surrounding tiles are cleared",
+          "Time limits in challenge modes test your speed",
+          "Musical note tiles have specific matching patterns",
+          "Complex layouts require careful planning and observation"
+        ],
+        scoring: [
+          "Basic matching: Points for each pair of tiles matched",
+          "Combo chains: Consecutive matches multiply your score",
+          "Musical sets: Bonus points for matching themed sets",
+          "Time efficiency: Faster completion earns time bonuses",
+          "Board clearance: Major bonus for removing all tiles"
+        ],
+        tips: [
+          "Focus on removing tiles that block many others first",
+          "Look for matching pairs on the edges and top layer first",
+          "Mentally categorize tiles by instrument type for easier matching",
+          "Use hints strategically when completely stuck",
+          "Listen for audio cues that may hint at possible matches",
+          "Work methodically from one area to another for best results"
+        ]
+      };
+    }
+    else if (gameId === 'triple-dimensions-ice-age') {
+      return {
+        issues: [
+          "Three-dimensional perspective makes some tiles harder to see",
+          "Tiles must be free on at least one side to be matched",
+          "Rotating the view is essential to find all matches",
+          "Ice-themed tiles may look similar and require careful observation",
+          "Complex 3D structures create challenging puzzles"
+        ],
+        scoring: [
+          "Basic matching: Points for each pair of tiles matched",
+          "View efficiency: Fewer view rotations results in higher scores",
+          "Quick matching: Time bonuses for rapid play",
+          "Special tiles: Extra points for matching rare ice age creatures",
+          "Complete clearance: Major bonus for clearing all tiles"
+        ],
+        tips: [
+          "Regularly rotate the view to see all available tiles",
+          "Start with the most visible outer layer tiles first",
+          "Note the positions of similar-looking tiles for future matching",
+          "Focus on freeing up blocked areas of the structure",
+          "Take your time to understand the 3D layout before making moves",
+          "Use hints only when you've checked all possible viewing angles"
+        ]
+      };
+    }
+    else if (gameId === 'hidden-spots-city') {
+      return {
+        issues: [
+          "Objects are cleverly camouflaged within urban environments",
+          "Some items may be very small or partially obscured",
+          "Time limits create pressure in challenge modes",
+          "City backgrounds contain many distracting elements",
+          "Limited hints available per level"
+        ],
+        scoring: [
+          "Object discovery: Points for each found item",
+          "Quick finding: Time bonuses for rapid discoveries",
+          "Hint usage: Penalties for using hints",
+          "Accuracy: Bonuses for clicking correctly without mistakes",
+          "Level completion: Major bonus for finding all items"
+        ],
+        tips: [
+          "Scan the scene methodically rather than randomly",
+          "Look for objects in unexpected places or unusual scales",
+          "Check shadows and reflections for hidden items",
+          "Use the zoom feature to examine detailed areas",
+          "Save hints for the last few most difficult objects",
+          "Take note of commonly used hiding spots for future levels"
+        ]
+      };
+    }
+    else if (gameId === 'mysterious-pirate-jewels-3') {
+      return {
+        issues: [
+          "Colored backgrounds must be cleared by matching jewels over them",
+          "Limited moves in each level require strategic planning",
+          "Special obstacles need specific match patterns to remove",
+          "Pirate-themed blockers add complexity to boards",
+          "Objective requirements increase substantially in later levels"
+        ],
+        scoring: [
+          "Basic matches: Points for standard three-jewel matches",
+          "Special jewels: Extra points for creating and using special jewels",
+          "Combo chains: Cascading matches multiply points",
+          "Background clearing: Bonuses for efficient background removal",
+          "Objective completion: Major bonus for meeting level goals"
+        ],
+        tips: [
+          "Focus on clearing background spaces first",
+          "Create special jewels by matching more than three gems",
+          "Plan moves to set up cascade reactions",
+          "Prioritize removing blockers that restrict board movement",
+          "Save powerful combinations for difficult objectives",
+          "Always check the level goals before planning your strategy"
+        ]
+      };
+    }
+    else if (gameId === 'christmas-tree-solitaire') {
+      return {
+        issues: [
+          "Cards must sum to 13 to be removed (J=11, Q=12, K=13)",
+          "Only exposed cards at the bottom of the tree can be played",
+          "Strategic removal is essential to reach cards higher in the tree",
+          "Limited stock pile draws require careful planning",
+          "Festive card designs may require closer attention to values"
+        ],
+        scoring: [
+          "Card removal: Points for each pair successfully removed",
+          "Christmas cards: Bonus points for removing special holiday cards",
+          "Time efficiency: Faster completion earns time bonuses",
+          "Draw efficiency: Using fewer stock pile draws increases score",
+          "Tree clearance: Major bonus for removing the entire tree"
+        ],
+        tips: [
+          "Always check for Kings first as they can be removed individually",
+          "Prioritize removing cards that unblock the most cards above",
+          "Use the stock pile strategically when no moves are available",
+          "Plan ahead to avoid leaving single cards with no possible matches",
+          "Focus on clearing the bottom row completely before moving up",
+          "Remember that Aces count as 1 and pair with Queens (12)"
+        ]
+      };
+    }
+    else if (gameId === 'garden-secrets') {
+      return {
+        issues: [
+          "Hidden objects blend naturally with garden elements",
+          "Some items may be partially obscured by plants or decorations",
+          "Varying lighting conditions affect visibility",
+          "Time limits add challenge in certain game modes",
+          "Limited hints available per garden scene"
+        ],
+        scoring: [
+          "Object discovery: Points for each item found",
+          "Quick finding: Time bonuses for rapid discoveries",
+          "Streak bonuses: Additional points for consecutive finds",
+          "Hint penalties: Score reductions for using hints",
+          "Scene completion: Major bonus for finding all objects"
+        ],
+        tips: [
+          "Scan the garden methodically from top to bottom",
+          "Check inside plant containers and behind garden features",
+          "Look for subtle color differences in foliage that may hide objects",
+          "Use the zoom feature to examine dense areas",
+          "Save hints for the most challenging items",
+          "Take breaks if your eyes get tired to maintain fresh perspective"
+        ]
+      };
+    }
+    else if (gameId === 'word-paradise') {
+      return {
+        issues: [
+          "Letters must be adjacent (horizontally, vertically, or diagonally)",
+          "Words must be at least three letters long",
+          "Some letters are locked behind obstacles requiring special moves",
+          "Board layouts become increasingly complex in higher levels",
+          "Time limits in challenge modes add pressure"
+        ],
+        scoring: [
+          "Word length: Longer words earn more points",
+          "Letter values: Uncommon letters (J, Q, X, Z) worth more points",
+          "Special tiles: Bonus multipliers for using special letter tiles",
+          "Word combinations: Extra points for using theme-related words",
+          "Level completion: Bonus for meeting all objectives"
+        ],
+        tips: [
+          "Look for prefixes and suffixes to extend shorter words",
+          "Focus on clearing obstacle tiles early in the level",
+          "Save power-ups for difficult objectives or bottlenecks",
+          "Check for the highest-scoring letters when planning words",
+          "Build your vocabulary by noting new words discovered",
+          "Sometimes shorter words in strategic positions are better than longer ones"
+        ]
+      };
+    }
+    else if (gameId === 'jigsaw-master') {
+      return {
+        issues: [
+          "Pieces must be rotated and placed correctly",
+          "Similar colors and patterns can be challenging to distinguish",
+          "Higher piece counts create significantly more difficult puzzles",
+          "Edge and corner identification becomes crucial in complex puzzles",
+          "Time management is important in timed challenge modes"
+        ],
+        scoring: [
+          "Correct placements: Points for each piece correctly placed",
+          "Time efficiency: Faster completion earns time bonuses",
+          "Hint usage: Penalties for using automatic placements",
+          "Accuracy: Bonuses for fewer incorrect placement attempts",
+          "Puzzle completion: Major bonus based on difficulty level"
+        ],
+        tips: [
+          "Always start by finding and placing the corner pieces",
+          "Next, complete the border by identifying edge pieces",
+          "Sort pieces by color or pattern before attempting placement",
+          "Use the preview image as a reference for difficult sections",
+          "Work on distinct features or colors that stand out",
+          "For large puzzles, complete small sections and then connect them"
+        ]
+      };
+    }
+    else if (gameId === 'zoo-merge') {
+      return {
+        issues: [
+          "Limited board space requires strategic planning",
+          "Higher-level animal enclosures need more merges to create",
+          "Random new enclosures can create space management challenges",
+          "Some rare animals have special requirements to discover",
+          "Advanced levels require efficient merging paths"
+        ],
+        scoring: [
+          "Basic merges: Points for each successful combination",
+          "New discoveries: Major bonuses for unlocking new animals",
+          "Enclosure level: Higher-level enclosures worth more points",
+          "Collection completion: Rewards for completing animal sets",
+          "Special events: Bonus points for seasonal discoveries"
+        ],
+        tips: [
+          "Always maintain some empty space for new items",
+          "Focus on merging lower-level items first to free up space",
+          "Keep similar enclosures near each other for easier combining",
+          "Plan your merges several steps ahead",
+          "Don't rush to merge everything immediately - timing matters",
+          "Use boosters strategically during space shortage situations"
+        ]
+      };
+    }
+    else if (gameId === 'dots-and-boxes') {
+      return {
+        issues: [
+          "Drawing a line that completes a box gives you another turn",
+          "Strategic planning is essential to avoid setting up boxes for opponents",
+          "Larger grids require more complex strategies",
+          "Chain reactions can lead to multiple boxes claimed in one turn",
+          "Higher difficulty AI opponents use advanced tactics"
+        ],
+        scoring: [
+          "Box completion: Points for each box claimed",
+          "Chain captures: Bonus for capturing multiple boxes in sequence",
+          "Board dominance: Percentage-based scoring for total control",
+          "Strategic moves: Extra points for forcing advantageous positions",
+          "Game completion: Win/loss record maintained for statistics"
+        ],
+        tips: [
+          "Avoid drawing the third side of a box unless you can claim a chain",
+          "Look for opportunities to create 'sacrifice' boxes to claim larger chains",
+          "Control the center of the board early for better positioning",
+          "Count the remaining moves to anticipate endgame scenarios",
+          "Learn to recognize the 'double-cross' pattern for optimal play",
+          "On larger grids, divide your strategy into manageable sections"
+        ]
+      };
+    }
+
+    // Adding rules and tips for the third batch of new games
+    if (gameId === 'retro-breakout') {
+      return {
+        issues: [
+          "Ball speed increases as you progress through levels",
+          "Missing the ball with your paddle results in lost lives",
+          "Some bricks require multiple hits to destroy",
+          "Power-ups and power-downs affect gameplay dynamics",
+          "Special bricks have unique properties and effects"
+        ],
+        scoring: [
+          "Brick destruction: Points for each brick destroyed",
+          "Power-up collection: Bonus points for collecting certain items",
+          "Level completion: Completion bonus based on remaining lives",
+          "Special bricks: Extra points for destroying special bricks",
+          "Speed bonus: Additional points for completing levels quickly"
+        ],
+        tips: [
+          "Focus on controlling the paddle's position rather than chasing the ball",
+          "Aim for clusters of bricks to maximize destruction",
+          "Break through to the top of the brick formation when possible",
+          "Collect power-ups that widen your paddle or create multiple balls",
+          "Learn to predict ball rebounds by observing angles",
+          "Try to maintain a favorable ball angle rather than hit directly upward"
+        ]
+      };
+    }
+    else if (gameId === 'match-4') {
+      return {
+        issues: [
+          "Items must be matched in groups of four or more",
+          "Limited moves in each level require strategic planning",
+          "Special objectives beyond matching add complexity",
+          "Blockers and obstacles require specific approaches",
+          "Grid layouts become increasingly complex in higher levels"
+        ],
+        scoring: [
+          "Basic matches: Points for standard four-item matches",
+          "Larger matches: Higher points for matching more than four items",
+          "Special items: Bonus points for creating and using special items",
+          "Combos: Cascading matches multiply your score",
+          "Objective completion: Major bonus for meeting level goals"
+        ],
+        tips: [
+          "Focus on creating special items by matching more than four pieces",
+          "Prioritize removing obstacles that restrict board movement",
+          "Look for match opportunities that could trigger cascades",
+          "Plan several moves ahead rather than making immediate matches",
+          "Save powerful special items for difficult objectives",
+          "Always check the level goals before planning your strategy"
+        ]
+      };
+    }
+    else if (gameId === 'tropical-solitaire') {
+      return {
+        issues: [
+          "Cards must be moved to foundation piles in ascending order by suit",
+          "Tableau cards must be arranged in descending order with alternating colors",
+          "Only kings can be placed in empty tableau spaces",
+          "Strategy becomes crucial with limited moves in harder difficulties",
+          "Some card arrangements may lead to unsolvable situations"
+        ],
+        scoring: [
+          "Card movement: Points for each proper card placement",
+          "Foundation building: Bonuses for completing suit sequences",
+          "Time efficiency: Faster completion earns time bonuses",
+          "Move efficiency: Using fewer moves increases your score",
+          "Complete game: Major bonus for finishing the entire deck"
+        ],
+        tips: [
+          "Always try to reveal face-down cards in the tableau",
+          "Create empty columns when possible to provide more movement options",
+          "Move cards to foundations when it doesn't block important moves",
+          "Pay attention to both card color and suit when planning moves",
+          "Use the stock pile efficiently and try to plan ahead",
+          "Focus on setting up long sequences for multiple moves"
+        ]
+      };
+    }
+    else if (gameId === 'emoji-connect') {
+      return {
+        issues: [
+          "Emoji pairs must be connected by a path with no more than two turns",
+          "Connecting lines cannot cross other emojis or obstacles",
+          "Time limits in challenge modes add pressure",
+          "Similar-looking emojis require careful observation",
+          "Layout complexity increases with each level"
+        ],
+        scoring: [
+          "Quick connections: Time bonuses for rapid matching",
+          "Consecutive pairs: Combo multipliers for chains of matches",
+          "Difficult connections: Extra points for complex path connections",
+          "Special emojis: Bonus points for matching rare emojis",
+          "Level completion: Major bonus for clearing all emojis"
+        ],
+        tips: [
+          "Focus on matching emojis that could become isolated",
+          "Start with emojis at the edges of the board",
+          "Remember that connection paths can go around corners twice",
+          "Look for matching pairs that are close to each other first",
+          "Use hints strategically when completely stuck",
+          "Plan your matching sequence to avoid creating isolated pairs"
+        ]
+      };
+    }
+    else if (gameId === 'crossword-daily') {
+      return {
+        issues: [
+          "Clues vary in difficulty and require diverse knowledge",
+          "Words must fit interconnecting spaces correctly",
+          "Some answers may have multiple possible solutions",
+          "Limited hints are available per puzzle",
+          "Time pressure in challenge modes tests vocabulary speed"
+        ],
+        scoring: [
+          "Word completion: Points for each correctly filled word",
+          "Time efficiency: Faster completion earns time bonuses",
+          "Hint usage: Penalties for using hints",
+          "Difficulty level: Higher points for more difficult puzzles",
+          "Error-free completion: Perfect solution bonuses"
+        ],
+        tips: [
+          "Start with shorter words to build confidence and letter hints",
+          "Fill in answers you're certain of first",
+          "Use crossing words to help solve difficult clues",
+          "Look for plural endings and common prefixes",
+          "When stuck, take a break and return with fresh perspective",
+          "Learn common crossword vocabulary that appears frequently"
+        ]
+      };
+    }
+    else if (gameId === 'block-puzzle-king') {
+      return {
+        issues: [
+          "Blocks cannot be rotated once placed on the grid",
+          "Space management becomes increasingly critical",
+          "New blocks appear in random shapes and configurations",
+          "Game ends when no more blocks can be placed",
+          "Planning multiple moves ahead is essential for high scores"
+        ],
+        scoring: [
+          "Line clearing: Points for each completed line (horizontal or vertical)",
+          "Multiple lines: Bonus multipliers for clearing several lines at once",
+          "Board utilization: Efficient space usage increases score",
+          "Special blocks: Extra points for placing complex shapes optimally",
+          "Consecutive clears: Score multipliers for back-to-back line clears"
+        ],
+        tips: [
+          "Try to keep the board as empty as possible",
+          "Prioritize clearing multiple lines with a single block placement",
+          "Keep the edges clear and work toward the center",
+          "Place complex shapes first when possible",
+          "Create opportunities for straight line blocks",
+          "Think several moves ahead considering upcoming blocks"
+        ]
+      };
+    }
+    else if (gameId === 'backgammon-master') {
+      return {
+        issues: [
+          "Dice rolls introduce an element of luck alongside strategy",
+          "Moving pieces effectively requires understanding positioning",
+          "Blocking opponent movement is a key tactical element",
+          "Bearing off pieces requires precise planning",
+          "Different strategies needed for different game phases"
+        ],
+        scoring: [
+          "Game victory: Points for winning games",
+          "Doubling cube: Score multipliers through effective doubling",
+          "Gammon/Backgammon: Bonus points for special victories",
+          "Tournament points: ELO-based rating system for competitive play",
+          "Special moves: Recognition for exceptional tactical plays"
+        ],
+        tips: [
+          "Focus on creating 'points' by placing multiple checkers together",
+          "Balance offense and defense based on board position",
+          "Learn when to accept or decline doubles",
+          "Avoid leaving single checkers exposed when possible",
+          "Use the 'running game' strategy when ahead in the race",
+          "Learn the proper bearing off technique for endgame efficiency"
+        ]
+      };
+    }
+    else if (gameId === 'hidden-numbers') {
+      return {
+        issues: [
+          "Numbers are cleverly camouflaged within scene elements",
+          "Some digits appear in unexpected scales or orientations",
+          "Time limits add pressure in challenge modes",
+          "Complex backgrounds create visual distraction",
+          "Later levels feature increasingly subtle number placement"
+        ],
+        scoring: [
+          "Number discovery: Points for each digit found",
+          "Quick finding: Time bonuses for rapid discoveries",
+          "Sequential finding: Extra points for finding numbers in order",
+          "Hint usage: Penalties for using hints",
+          "Level completion: Major bonus for finding all numbers"
+        ],
+        tips: [
+          "Scan the scene methodically rather than randomly",
+          "Look for shapes that resemble digits in unexpected places",
+          "Check reflections, shadows, and negative spaces",
+          "Use the zoom feature to examine detailed areas",
+          "Train your brain to recognize number shapes in unusual contexts",
+          "Take regular breaks to maintain fresh perspective"
+        ]
+      };
+    }
+    else if (gameId === 'memory-match-masters') {
+      return {
+        issues: [
+          "Cards are shuffled randomly each game",
+          "Limited time in challenge modes tests memory speed",
+          "Higher difficulties include more pairs and similar images",
+          "Special cards may have unique matching rules",
+          "Multi-stage levels require sustained concentration"
+        ],
+        scoring: [
+          "Successful matches: Points for each matched pair",
+          "Quick matching: Time bonuses for fast pairs",
+          "Consecutive matches: Combo multipliers for streaks",
+          "Minimum flips: Efficiency bonuses for fewer card flips",
+          "Level completion: Major bonus based on performance metrics"
+        ],
+        tips: [
+          "Try to memorize both the card image and its position",
+          "Focus on small sections of the board rather than the whole grid",
+          "Watch for visual patterns in card arrangements",
+          "If playing timed modes, prioritize quick matching over perfect play",
+          "Create mental associations to help remember card positions",
+          "After seeing a card, think where you've seen its match before"
+        ]
+      };
+    }
+    else if (gameId === 'word-search-deluxe') {
+      return {
+        issues: [
+          "Words can be hidden in any direction (horizontal, vertical, diagonal)",
+          "Letters may be used in multiple words",
+          "Word lists become longer in advanced puzzles",
+          "Time limits in challenge modes add pressure",
+          "Similar word beginnings can cause confusion"
+        ],
+        scoring: [
+          "Word finding: Points for each discovered word",
+          "Word length: Longer words earn more points",
+          "Quick finding: Time bonuses for fast completion",
+          "Consecutive finds: Combo multipliers for word streaks",
+          "Puzzle completion: Major bonus for finding all words"
+        ],
+        tips: [
+          "Scan for the first letter of longer words first",
+          "Look for rare letters like Q, Z, and X to find unique words quickly",
+          "Use systematic scanning patterns (horizontal, vertical, diagonal)",
+          "For timed challenges, find shorter words first for quick points",
+          "When stuck, try looking at the grid from different angles",
+          "Sometimes reading backward can help spot reversed words"
+        ]
+      };
+    }
+
+    // Adding rules and tips for the fourth batch of new games
+    if (gameId === 'animal-puzzle') {
+      return {
+        issues: [
+          "Tiles must be moved into the correct position to complete the image",
+          "Only tiles adjacent to the empty space can be moved",
+          "Higher difficulty levels include more puzzle pieces",
+          "Some animal patterns can be challenging to distinguish",
+          "Time pressure in challenge modes adds complexity"
+        ],
+        scoring: [
+          "Move efficiency: Fewer moves results in higher scores",
+          "Completion time: Faster solutions earn more points",
+          "Difficulty level: Higher difficulties award more points",
+          "Perfect patterns: Bonuses for completing special animal collections",
+          "Challenge completion: Special bonuses for timed challenges"
+        ],
+        tips: [
+          "Start by solving the borders and corners first",
+          "Focus on distinctive animal features like eyes or patterns",
+          "Work on small sections of the image at a time",
+          "Use the reference image when available for guidance",
+          "Plan several moves ahead to avoid undoing progress",
+          "For timed challenges, balance speed with move efficiency"
+        ]
+      };
+    }
+    else if (gameId === 'color-sort') {
+      return {
+        issues: [
+          "Colors must be sorted into tubes containing only one color",
+          "Liquid can only be poured if there's enough empty space",
+          "You can only move the top color segment of each tube",
+          "Strategic planning is essential as moves are limited",
+          "More tubes and colors increase puzzle complexity"
+        ],
+        scoring: [
+          "Move efficiency: Using fewer moves increases your score",
+          "Level completion: Points awarded for each solved puzzle",
+          "Time efficiency: Faster solutions earn time bonuses",
+          "Difficulty level: Higher difficulties award more points",
+          "Perfect sorting: Bonuses for optimal solutions"
+        ],
+        tips: [
+          "Focus on completing one color tube at a time",
+          "Use empty tubes as temporary storage for strategic moves",
+          "Analyze the puzzle before making your first move",
+          "Try to avoid creating mixed color segments that are hard to separate",
+          "Sometimes moving backwards temporarily helps create better options",
+          "When possible, keep at least one tube completely empty"
+        ]
+      };
+    }
+    else if (gameId === 'chess-classics') {
+      return {
+        issues: [
+          "Each piece moves according to specific rules",
+          "Protecting your king while threatening opponent's king is key",
+          "Opening strategies significantly impact mid-game position",
+          "Time management is crucial in timed matches",
+          "Advanced tactics require planning several moves ahead"
+        ],
+        scoring: [
+          "Game victory: Points for winning matches",
+          "Piece advantage: Score reflecting material advantage",
+          "Positional strength: Evaluation of board control",
+          "Puzzle solving: Points for tactical challenge completion",
+          "Rating system: ELO-based ranking for competitive play"
+        ],
+        tips: [
+          "Control the center of the board early in the game",
+          "Develop your knights and bishops before making major attacks",
+          "Castle early to protect your king and connect your rooks",
+          "Look for forks, pins, and skewers to gain material advantage",
+          "Practice common endgame scenarios to improve finishing skills",
+          "Study opening principles rather than memorizing specific lines"
+        ]
+      };
+    }
+    else if (gameId === 'fruit-match-paradise') {
+      return {
+        issues: [
+          "Match three or more identical fruits to remove them",
+          "Special objectives require specific match types",
+          "Limited moves in each level demand efficient planning",
+          "Blockers and obstacles require targeted strategies",
+          "Cascading effects can be unpredictable yet valuable"
+        ],
+        scoring: [
+          "Basic matches: Points for standard three-fruit matches",
+          "Larger matches: Extra points for matching four or more fruits",
+          "Special fruits: Bonus points for creating and using special fruits",
+          "Cascades: Score multipliers for chain reactions",
+          "Objective completion: Major bonus for meeting level goals"
+        ],
+        tips: [
+          "Focus on creating special fruits by matching four or more in a row",
+          "Prioritize removing blockers that restrict board movement",
+          "Set up combos by positioning special fruits next to each other",
+          "Always check the level goals before planning your strategy",
+          "Save power-ups for difficult situations rather than using immediately",
+          "Look for potential cascade opportunities before making moves"
+        ]
+      };
+    }
+    else if (gameId === 'space-mahjong') {
+      return {
+        issues: [
+          "Space-themed tiles must be matched in identical pairs",
+          "Tiles can only be selected if they're free on at least one side",
+          "Orbital layouts create complex three-dimensional puzzles",
+          "Time constraints in challenge modes add pressure",
+          "Limited hints available per level"
+        ],
+        scoring: [
+          "Matched pairs: Points for each successfully matched pair",
+          "Quick matching: Time bonuses for rapid play",
+          "Combo chains: Multipliers for consecutive matches",
+          "Special tiles: Bonus points for matching rare cosmic tiles",
+          "Level completion: Major bonus for clearing all tiles"
+        ],
+        tips: [
+          "Start with the outermost tiles to create more freedom of movement",
+          "Look for matching pairs that will unblock the most tiles",
+          "Pay attention to the 3D layout and tiles that may be hiding others",
+          "Use hints strategically when completely stuck",
+          "Try to keep multiple options open rather than clearing one area completely",
+          "Scan the entire board regularly as new matches become available"
+        ]
+      };
+    }
+    else if (gameId === 'hangman-challenge') {
+      return {
+        issues: [
+          "Limited guesses before the hangman is completed",
+          "More difficult words have fewer common letters",
+          "Category hints may be broad or specific",
+          "Special characters and spaces add complexity",
+          "Time pressure in challenge modes tests quick thinking"
+        ],
+        scoring: [
+          "Correct guesses: Points for each correct letter",
+          "Word completion: Bonus for solving the entire word",
+          "Guess efficiency: Higher score for fewer incorrect guesses",
+          "Difficulty level: More points for harder words",
+          "Category mastery: Bonuses for completing themed word sets"
+        ],
+        tips: [
+          "Start with common vowels (E, A, I, O, U)",
+          "Then try common consonants: R, S, T, L, N",
+          "Consider the word length and category for context clues",
+          "Look for patterns in partially revealed words",
+          "Pay attention to letter frequency in different languages",
+          "Remember previously guessed letters across games to improve"
+        ]
+      };
+    }
+    else if (gameId === 'magic-solitaire') {
+      return {
+        issues: [
+          "Cards must be arranged in foundation piles by suit and rank",
+          "Tableau cards must follow alternating colors and descending values",
+          "Magical effects can change rules temporarily",
+          "Special enchanted cards have unique properties",
+          "Strategic planning becomes crucial in advanced levels"
+        ],
+        scoring: [
+          "Card movement: Points for each successful card placement",
+          "Foundation building: Bonuses for completing suit sequences",
+          "Magic usage: Efficient spell casting increases score",
+          "Time efficiency: Faster completion earns time bonuses",
+          "Game completion: Major bonus for clearing all cards"
+        ],
+        tips: [
+          "Always try to reveal face-down cards in the tableau",
+          "Use magical powers strategically for difficult situations",
+          "Create empty columns when possible for Kings",
+          "Balance moving cards to foundations versus building tableau sequences",
+          "Pay attention to both card color and suit when planning moves",
+          "Save powerful spells for truly challenging situations"
+        ]
+      };
+    }
+    else if (gameId === '2048-masters') {
+      return {
+        issues: [
+          "Tiles can only be moved in four directions (up, down, left, right)",
+          "All tiles move simultaneously in the chosen direction",
+          "New tiles appear after each move, potentially blocking optimal paths",
+          "Board space management becomes increasingly critical",
+          "Planning several moves ahead is essential for high scores"
+        ],
+        scoring: [
+          "Tile merging: Points equal to the value of each new merged tile",
+          "High value tiles: Exponentially increasing points for larger numbers",
+          "Board efficiency: Maintaining open spaces improves scoring potential",
+          "Chain reactions: Multiple merges in one move multiply score",
+          "Highest tile: Record of the largest tile value achieved"
+        ],
+        tips: [
+          "Keep your highest numbered tiles in one corner",
+          "Maintain a clear path to your high-value corner",
+          "Focus on merging smaller tiles before they spread across the board",
+          "Avoid making moves that place small tiles between large ones",
+          "When possible, maintain at least one empty row or column",
+          "Think about the consequences of new tile spawns when planning moves"
+        ]
+      };
+    }
+    else if (gameId === 'minesweeper-pro') {
+      return {
+        issues: [
+          "Hidden mines must be flagged without being clicked",
+          "Numerical clues indicate mines in adjacent cells",
+          "First click is always safe but crucial for board setup",
+          "Deductive reasoning is essential for efficient clearing",
+          "Time pressure in competitive modes adds challenge"
+        ],
+        scoring: [
+          "Board clearing: Points for successfully revealed safe cells",
+          "Efficiency: Bonus for minimum number of clicks",
+          "Time completion: Faster solutions earn more points",
+          "Difficulty level: Higher difficulties award more points",
+          "Perfect games: Special recognition for no-guess completions"
+        ],
+        tips: [
+          "Always start in a corner or edge for better initial information",
+          "Use flagging to mark confirmed mines for clearer tracking",
+          "Look for cells with numbers matching their remaining hidden neighbors",
+          "Use process of elimination when analyzing groups of cells",
+          "When stuck, look for overlapping numerical clues",
+          "Don't guess unless absolutely necessary - there's usually a logical solution"
+        ]
+      };
+    }
+    else if (gameId === 'picture-cross') {
+      return {
+        issues: [
+          "Numerical clues indicate groups of filled cells in each row and column",
+          "Deductive logic is required to determine which cells to fill",
+          "More complex puzzles have multiple separated groups per line",
+          "Some puzzles use multiple colors for additional challenge",
+          "Larger grids significantly increase puzzle complexity"
+        ],
+        scoring: [
+          "Puzzle completion: Points awarded for each solved puzzle",
+          "Time efficiency: Faster solutions earn time bonuses",
+          "Hint usage: Penalties for using hints",
+          "Difficulty level: Higher difficulties award more points",
+          "Error-free solving: Perfect solution bonuses"
+        ],
+        tips: [
+          "Start with rows and columns that have simple clues (zeros or full lines)",
+          "Mark cells you know must be empty to narrow down possibilities",
+          "Look for overlaps when working with multiple groups in a line",
+          "Cross-reference row and column clues to confirm cell states",
+          "Work systematically rather than jumping around the puzzle",
+          "When stuck, look for rows or columns where only one possible arrangement exists"
+        ]
+      };
+    }
+
+    // Adding rules and tips for the fifth batch of new games
+    if (gameId === 'sudoku-master') {
+      return {
+        issues: [
+          "Each row, column, and 3x3 box must contain numbers 1-9 without repetition",
+          "Advanced puzzles have fewer numbers pre-filled",
+          "Logical deduction is essential as guessing often leads to unsolvable grids",
+          "Time pressure in challenge modes adds complexity",
+          "Some advanced puzzles require specialized solving techniques"
+        ],
+        scoring: [
+          "Completion time: Faster solutions earn more points",
+          "Hint usage: Using fewer hints increases score",
+          "Mistake avoidance: Perfect solutions earn bonuses",
+          "Difficulty level: Higher difficulties award more points",
+          "Consecutive solves: Streaks of completed puzzles add bonus multipliers"
+        ],
+        tips: [
+          "Start with scanning for 'naked singles' - cells with only one possible value",
+          "Use pencil marks to track possible numbers for each cell",
+          "Focus on rows, columns or boxes with the most numbers already filled",
+          "Look for 'hidden singles' where a number can only go in one position",
+          "When stuck, try the 'pointing pairs' technique to eliminate possibilities",
+          "For harder puzzles, learn advanced techniques like X-Wing and Swordfish"
+        ]
+      };
+    }
+    else if (gameId === 'jewelish') {
+      return {
+        issues: [
+          "Match three or more identical jewels to remove them from the board",
+          "Limited moves in each level require strategic planning",
+          "Special objectives like breaking ice blocks add complexity",
+          "Blockers and obstacles impede gem movement",
+          "Time limits in certain levels create pressure"
+        ],
+        scoring: [
+          "Basic matches: Points for standard three-jewel matches",
+          "Larger matches: Bonus points for matching four or more jewels",
+          "Special gems: Points for creating and using special jewels",
+          "Cascades: Multipliers for chain reactions",
+          "Objective completion: Major bonuses for meeting level goals"
+        ],
+        tips: [
+          "Focus on creating special jewels by matching four or five in a row",
+          "Prioritize clearing obstacles that restrict board movement",
+          "Look for potential cascade opportunities before making moves",
+          "Save special jewels for difficult objectives rather than using immediately",
+          "When possible, make matches at the bottom of the board to affect more gems",
+          "Pay attention to level objectives before planning your strategy"
+        ]
+      };
+    }
+    else if (gameId === 'puzzle-blocks') {
+      return {
+        issues: [
+          "Blocks must be placed within the grid boundaries",
+          "No overlapping of blocks is allowed",
+          "Limited space makes placement increasingly difficult",
+          "Block shapes become more complex as you progress",
+          "Strategic planning is essential to maximize space usage"
+        ],
+        scoring: [
+          "Line clearing: Points for completing rows and columns",
+          "Multiple lines: Bonuses for clearing several lines at once",
+          "Space efficiency: Better utilization of grid space scores higher",
+          "Block placement: Points for successfully placing difficult blocks",
+          "Game duration: Longer survival time improves overall score"
+        ],
+        tips: [
+          "Prioritize placing larger and more awkward blocks first",
+          "Try to keep the board as empty and even as possible",
+          "Create opportunities to clear multiple lines with single placements",
+          "Pay attention to upcoming blocks to plan several moves ahead",
+          "When stuck, focus on areas with small isolated spaces",
+          "Leave spaces for specifically shaped blocks when you know they're coming"
+        ]
+      };
+    }
+    else if (gameId === 'dominoes-classic') {
+      return {
+        issues: [
+          "Each domino has two number sections that must be matched appropriately",
+          "Strategic play requires balancing offense and defense",
+          "Different game variants have unique rules and objectives",
+          "Blocking opponents while maintaining your own options is crucial",
+          "Managing your tile collection effectively determines success"
+        ],
+        scoring: [
+          "Tile placement: Points for successfully playing dominoes",
+          "Ending rounds: Bonuses for being first to use all tiles",
+          "Opponent tiles: Points based on remaining dominoes in opponents' hands",
+          "Special combinations: Extra points for specific number patterns",
+          "Game variants: Different scoring systems based on game mode"
+        ],
+        tips: [
+          "Keep track of which numbers have been played frequently",
+          "In Block game, try to play tiles that make it difficult for opponents to play",
+          "In Draw game, sometimes drawing is better than playing a valuable tile",
+          "Prioritize playing doubles early as they can be difficult to place later",
+          "When possible, play tiles that give you multiple future options",
+          "In All Fives, aim for combinations that total multiples of five"
+        ]
+      };
+    }
+    else if (gameId === 'jewel-explode') {
+      return {
+        issues: [
+          "Jewels must be connected in lines of three or more identical gems",
+          "Line drawing requires clear paths between matching jewels",
+          "Special objectives like reaching score targets add complexity",
+          "Limited moves in each level demand efficient planning",
+          "Explosion chains are powerful but unpredictable"
+        ],
+        scoring: [
+          "Basic connections: Points for standard three-jewel matches",
+          "Longer lines: Bonus points for connecting more jewels",
+          "Explosions: Major points for triggering special effects",
+          "Chain reactions: Multipliers for consecutive matches",
+          "Objective completion: Bonuses for meeting level goals"
+        ],
+        tips: [
+          "Look for opportunities to create longer connections for higher scores",
+          "Focus on triggering special jewels that create explosions",
+          "Plan your moves to set up chain reactions",
+          "Prioritize clearing obstacles that block potential connections",
+          "Save power-ups for difficult situations rather than using immediately",
+          "When the board refreshes, quickly scan for high-value match opportunities"
+        ]
+      };
+    }
+    else if (gameId === 'bingo-party') {
+      return {
+        issues: [
+          "Numbers are called randomly, requiring attention and quick reactions",
+          "Multiple card management adds complexity and divided attention",
+          "Special patterns beyond standard lines increase difficulty",
+          "Limited daubing time in fast-paced games creates pressure",
+          "Competition with other players adds strategic elements"
+        ],
+        scoring: [
+          "Pattern completion: Points for completing lines and special patterns",
+          "Speed bonuses: Extra points for fast daubing",
+          "Multiple bingos: Multipliers for achieving multiple patterns",
+          "Card efficiency: Bonuses for high completion percentage across all cards",
+          "Tournament ranking: Additional rewards based on performance against others"
+        ],
+        tips: [
+          "Start with managing 1-2 cards until you're comfortable with the pace",
+          "Use auto-daub for numbers when playing multiple cards",
+          "Focus on cards that are closest to forming patterns",
+          "Pay attention to which numbers are most needed across all your cards",
+          "In tournaments, prioritize special patterns that offer higher points",
+          "Use power-ups strategically during critical moments"
+        ]
+      };
+    }
+    else if (gameId === 'brain-teasers') {
+      return {
+        issues: [
+          "Puzzle types vary widely, requiring different thinking approaches",
+          "Difficulty increases progressively within each category",
+          "Time limits in challenge modes add pressure",
+          "Some puzzles require specialized knowledge or techniques",
+          "Hints are limited and must be used strategically"
+        ],
+        scoring: [
+          "Puzzle completion: Base points for solving each challenge",
+          "Time efficiency: Faster solutions earn bonus points",
+          "Hint usage: Solving without hints increases score",
+          "Difficulty level: Higher difficulties award more points",
+          "Streak bonuses: Consecutive correct solutions multiply points"
+        ],
+        tips: [
+          "Read instructions carefully as each puzzle type has unique rules",
+          "When stuck, take a break and return with fresh perspective",
+          "Look for patterns and relationships between elements",
+          "For logic puzzles, try working backward from potential solutions",
+          "Use process of elimination when facing multiple-choice options",
+          "Practice specific puzzle types to develop specialized solving techniques"
+        ]
+      };
+    }
+    else if (gameId === 'spider-solitaire-pro') {
+      return {
+        issues: [
+          "Cards must be arranged in descending order regardless of suit",
+          "Complete sequences from King to Ace must be of the same suit",
+          "Multiple difficulty levels with different numbers of suits",
+          "Limited space makes strategic movement essential",
+          "Planning several moves ahead is crucial for success"
+        ],
+        scoring: [
+          "Card movement: Points for each successful move",
+          "Sequence completion: Major bonuses for removing complete sequences",
+          "Move efficiency: Using fewer moves increases score",
+          "Time efficiency: Faster completion earns time bonuses",
+          "Difficulty level: Higher difficulties award more points"
+        ],
+        tips: [
+          "Focus first on exposing face-down cards to see more of your options",
+          "Try to create empty columns whenever possible for temporary storage",
+          "When multiple moves are possible, prioritize those that expose new cards",
+          "In multi-suit games, try to build sequences of the same suit early",
+          "Use the undo feature to test different strategies when stuck",
+          "Be careful about moving cards off partial builds unless necessary"
+        ]
+      };
+    }
+    else if (gameId === 'daily-crossword') {
+      return {
+        issues: [
+          "Clues vary widely in difficulty and type (e.g., definitions, wordplay)",
+          "Grid intersections require compatible letter combinations",
+          "Specialized knowledge in certain topics may be required",
+          "Limited hints available for particularly challenging clues",
+          "Daily puzzles increase in difficulty throughout the week"
+        ],
+        scoring: [
+          "Puzzle completion: Base points for solving the entire grid",
+          "Time efficiency: Faster solutions earn time bonuses",
+          "Hint usage: Solving without hints increases score",
+          "Streak bonuses: Completing puzzles on consecutive days multiplies points",
+          "Difficulty level: Harder puzzles award more points"
+        ],
+        tips: [
+          "Start with the shorter words to build a foundation",
+          "Use crossings to help solve difficult words",
+          "Fill in obvious answers first, then use them to tackle harder clues",
+          "Pay attention to clue indicators like 'abbr.' for abbreviations",
+          "Learn common crossword vocabulary that appears frequently",
+          "When stuck, take a break and return with fresh perspective"
+        ]
+      };
+    }
+    
+    // Get similar games based on categories
+    const getSimilarGames = (currentGame: Game): Game[] => {
+      // Find games that share at least one category with the current game
+      return games
+        .filter(game => 
+          game.id !== currentGame.id && // Exclude current game
+          game.categories.some(category => 
+            currentGame.categories.includes(category)
+          )
+        )
+        .sort((a, b) => {
+          // Count shared categories to prioritize games with more category matches
+          const aSharedCategories = a.categories.filter(c => currentGame.categories.includes(c)).length;
+          const bSharedCategories = b.categories.filter(c => currentGame.categories.includes(c)).length;
+          
+          // Sort first by number of shared categories, then by rating
+          if (bSharedCategories !== aSharedCategories) {
+            return bSharedCategories - aSharedCategories;
+          }
+          return b.rating - a.rating;
+        })
+        .slice(0, 4); // Get top 4 similar games
+    };
+    
+    const similarGames = gameData ? getSimilarGames(gameData) : [];
+    
+    // Get appropriate game tips based on categories
+    const gameTips = getGameTips(gameData.categories);
+    
+    return (
+      <div className="min-h-screen bg-black text-white">
+        {/* Navigation bar */}
+        <header className="bg-black border-b border-gray-800 py-4 px-4">
+          <div className="container mx-auto flex justify-between items-center">
+            <Link href="/" className="text-xl font-bold">
+              <span className="text-amber-500">Online</span>
+              <span className="text-white">Games.wiki</span>
+            </Link>
+            <nav className="hidden md:flex space-x-6">
+              <Link href="/" className="hover:text-amber-500 transition-colors">Home</Link>
+              <Link href="/games" className="hover:text-amber-500 transition-colors">All Games</Link>
+              <Link href="/categories" className="hover:text-amber-500 transition-colors">Categories</Link>
+              <Link href="/leaderboard" className="hover:text-amber-500 transition-colors">Leaderboard</Link>
+              <Link href="/about" className="hover:text-amber-500 transition-colors">About Us</Link>
+            </nav>
+          </div>
+        </header>
+        
+        <main className="container mx-auto py-8 px-4">
+          {/* Game title and information */}
+          <div className="mb-4">
+            <h1 className="text-3xl font-bold">{gameData.title}</h1>
+            <div className="flex items-center gap-3 mt-2">
+              <div className="flex items-center">
+                <span className="text-amber-500 mr-1">★</span>
+                <span>{gameData.rating.toFixed(1)}</span>
+              </div>
+              {gameData.categories.map((category: string) => (
+                <span key={category} className="bg-gray-800 text-white text-xs px-3 py-1 rounded-full">
+                  {category}
+                </span>
+              ))}
+              <span className="text-gray-400">{gameData.playCount.toLocaleString()} players online</span>
+          </div>
+        </div>
+        
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Left side game area */}
+            <div className="lg:col-span-3">
+              {/* Game area */}
+              <div className="relative bg-purple-900 rounded-lg overflow-hidden mb-6">
+                <div className="w-full" style={{ position: 'relative', height: '75vh', overflow: 'hidden' }}>
+                  <GameEmbed 
+                    gameUrl={gameData.url}
+                    title={gameData.title}
+                  />
+                </div>
+              </div>
+
+              {/* Game description */}
+              <div>
+                <h2 className="text-2xl font-bold mb-3 uppercase">{gameData.title.toUpperCase()}</h2>
+                <p className="text-gray-300 mb-6">
+                  {gameData.description}
+                </p>
+        </div>
+            </div>
+            
+            {/* Right side game information */}
+          <div>
+              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-6 mb-6">
+                <h2 className="text-xl font-bold mb-4">Game Statistics</h2>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Rating:</span>
+                    <div className="flex items-center">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <span key={star} className={star <= Math.round(gameData.rating) ? 'text-amber-500' : 'text-gray-600'}>★</span>
+                    ))}
+                    <span className="ml-2 text-white">{gameData.rating.toFixed(1)}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Players:</span>
+                  <span className="text-white">{gameData.playCount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Difficulty:</span>
+                    <span className="text-amber-500">Easy to Hard</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Released:</span>
+                    <span className="text-white">2023</span>
+                  </div>
+              </div>
+            </div>
+            
+              {/* Similar games */}
+              <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-6 mb-6">
+                <h2 className="text-xl font-bold mb-4">Similar Games</h2>
+              {games.filter(g => 
+                g.id !== gameData.id && 
+                g.categories.some(cat => gameData.categories.includes(cat))
+                ).slice(0, 3).map(game => (
+            {/* Game description */}
+            <div>
+              <h2 className="text-2xl font-bold mb-3 uppercase">{gameData.title.toUpperCase()}</h2>
+              <p className="text-gray-300 mb-6">
+                {gameData.description}
+              </p>
+      </div>
+          </div>
+          
+          {/* Right side game information */}
+        <div>
+            <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-6 mb-6">
+              <h2 className="text-xl font-bold mb-4">Game Statistics</h2>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Rating:</span>
+                  <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} className={star <= Math.round(gameData.rating) ? 'text-amber-500' : 'text-gray-600'}>★</span>
+                  ))}
+                  <span className="ml-2 text-white">{gameData.rating.toFixed(1)}</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Players:</span>
+                <span className="text-white">{gameData.playCount.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Difficulty:</span>
+                  <span className="text-amber-500">Easy to Hard</span>
+              </div>
+              <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Released:</span>
+                  <span className="text-white">2023</span>
+                </div>
+            </div>
+          </div>
+          
+            {/* Similar games */}
+            <div className="bg-gray-800/30 backdrop-blur-sm rounded-lg p-6 mb-6">
+              <h2 className="text-xl font-bold mb-4">Similar Games</h2>
+            {games.filter(g => 
+              g.id !== gameData.id && 
+              g.categories.some(cat => gameData.categories.includes(cat))
+              ).slice(0, 3).map(game => (
+              <Link href={`/games/${game.id}`} key={game.id} className="flex items-center gap-3 bg-gray-700/50 rounded-lg p-2 mb-2 hover:bg-gray-700">
+                <img src={game.imageUrl} alt={game.title} className="w-12 h-12 rounded object-cover" />
+                <div>
+                  <div className="font-medium text-white">{game.title}</div>
+                    <div className="text-sm text-amber-500">★ {game.rating.toFixed(1)}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          
+            {/* Share game */}
+            <div className="bg-amber-500 text-black rounded-lg p-6">
+              <h2 className="text-xl font-bold mb-2">Share This Game</h2>
+              <p className="mb-4 text-sm">Share this fun game with your friends!</p>
+            <div className="flex justify-center gap-4">
+              <button className="p-2 bg-white rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#1DA1F2"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+              </button>
+              <button className="p-2 bg-white rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#4267B2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+              </button>
+              <button className="p-2 bg-white rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Game guide and tips */}
+        <div className="mt-8">
+          <div className="bg-gray-900 rounded-lg p-6 mb-6">
+            <div className="flex items-center mb-4">
+              <span className="bg-red-500 text-white w-7 h-7 rounded-full flex items-center justify-center mr-2 text-sm">N</span>
+              <h2 className="text-xl font-bold inline-block">Game Tips</h2>
+            </div>
+            <ul className="list-disc pl-5 text-gray-300 space-y-2">
+              {gameTips.issues.map((issue, index) => (
+                <li key={index}>{issue}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-900 rounded-lg p-6">
+              <h2 className="text-xl font-bold mb-4">Scoring System:</h2>
+              <ul className="list-disc pl-5 text-gray-300 space-y-2">
+                {gameTips.scoring.map((score, index) => (
+                  <li key={index}>{score}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-gray-900 rounded-lg p-6">
+              <h2 className="text-xl font-bold mb-4">Tips & Strategies</h2>
+              <ul className="list-disc pl-5 text-gray-300 space-y-2">
+                {gameTips.tips.map((tip, index) => (
+                  <li key={index}>{tip}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Similar Games */}
+        <section className="py-16 px-4 bg-gray-900">
+          <div className="container mx-auto">
+            <h2 className="text-3xl font-bold mb-6">Similar Games</h2>
+            <p className="text-gray-300 mb-6">
+              If you like {gameData?.title}, you might also enjoy these similar games.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similarGames.map((game: Game) => (
+                <Link key={game.id} href={`/games/${game.id}`}>
+                  <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
+                    <div className="h-48 relative">
+                      <img
+                        src={game.imageUrl}
+                        alt={game.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-70"></div>
+                      <div className="absolute bottom-0 left-0 p-4">
+                        <div className="flex items-center text-amber-400 mb-1">
+                          <span className="mr-1">★</span>
+                          <span>{game.rating.toFixed(1)}</span>
+                          <span className="text-gray-300 text-xs ml-2">
+                            {game.playCount.toLocaleString()} plays
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold text-lg mb-2">{game.title}</h3>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {game.categories.slice(0, 3).map((category: string) => (
+                          <span
+                            key={category}
+                            className="inline-block rounded-full bg-amber-600/60 px-2 py-0.5 text-xs"
+                          >
+                            {category}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-gray-400 text-sm line-clamp-2">
+                        {game.description.slice(0, 100)}...
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+        </div>
+      </div>
+        </section>
+      </main>
+      
+      <footer className="mt-16 py-8 border-t border-gray-800">
+        <div className="container mx-auto text-center text-gray-400 text-sm">
+          <p>© 2024 OnlineGames.wiki - All Rights Reserved</p>
+        </div>
+      </footer>
+    </div>
+  );
+} 
