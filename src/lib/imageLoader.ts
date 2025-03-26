@@ -17,6 +17,22 @@ export default function customImageLoader({ src, width, quality }: ImageLoaderPr
     return src;
   }
   
+  // 处理文件名大小写问题
+  if (src.includes('/images/games/uploads/')) {
+    const pathParts = src.split('/');
+    const fileName = pathParts[pathParts.length - 1];
+    const dirPath = pathParts.slice(0, pathParts.length - 1).join('/');
+    
+    // 将文件名中的每个单词首字母大写
+    const correctedFileName = fileName
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('-');
+    
+    // 构建新路径
+    src = `${dirPath}/${correctedFileName}`;
+  }
+  
   // 如果是本地开发环境，返回相对路径
   if (isDevelopment) {
     return src;
@@ -36,6 +52,22 @@ export function getFullImageUrl(relativePath: string): string {
   // 如果已经是完整URL，直接返回
   if (relativePath.startsWith('http')) {
     return relativePath;
+  }
+  
+  // 处理文件名大小写问题
+  if (relativePath.includes('/images/games/uploads/')) {
+    const pathParts = relativePath.split('/');
+    const fileName = pathParts[pathParts.length - 1];
+    const dirPath = pathParts.slice(0, pathParts.length - 1).join('/');
+    
+    // 将文件名中的每个单词首字母大写
+    const correctedFileName = fileName
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('-');
+    
+    // 构建新路径
+    relativePath = `${dirPath}/${correctedFileName}`;
   }
   
   // 在开发环境下返回相对路径
