@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { games, Game } from '../../lib/games';
+import { games, Game, getGameImageUrl } from '../../lib/games';
 import SearchBar from '../../components/SearchBar';
 import Image from 'next/image';
 
@@ -42,7 +42,7 @@ function SearchResultsContent() {
               <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-amber-500/20 transition-all cursor-pointer hover:scale-[1.02]">
                 <div className="aspect-[4/3] bg-gray-700 relative overflow-hidden">
                   <Image 
-                    src={game.imageUrl}
+                    src={getGameImageUrl(game.imageUrl)}
                     alt={game.title}
                     width={400}
                     height={300}

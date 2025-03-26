@@ -1,44 +1,34 @@
 import { ImageLoaderProps } from 'next/image';
 
 // 检查是否在本地开发环境
-const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === 'development';
+// 部署URL
+const deploymentUrl = 'https://onlinegames-rho.vercel.app';
 
 // 定义图片加载处理函数
 export default function customImageLoader({ src, width, quality }: ImageLoaderProps): string {
-  // 用于调试图片加载问题
-  console.log("Loading image:", src);
+  // 调试信息
+  if (isDevelopment) {
+    console.log("Loading image:", src);
+  }
   
-  // 如果是完整URL（以http开头），直接返回
+  // 完整的外部URL，直接返回
   if (src.startsWith('http')) {
     return src;
   }
   
-  // 如果是本地开发环境，使用相对路径
+  // 如果是本地开发环境，返回相对路径
   if (isDevelopment) {
     return src;
   }
   
-  // 如果是相对路径（以/images开头）
-  if (src.startsWith('/images')) {
-    // 在Vercel上，需要确保路径正确
-    const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_BASE_URL || '';
-      
-    // 防止在URL中出现双斜杠
-    const cleanSrc = src.startsWith('/') ? src : `/${src}`;
-    
-    // 返回完整URL
-    return `${baseUrl}${cleanSrc}`;
+  // 相对路径处理
+  if (src.startsWith('/')) {
+    return `${deploymentUrl}${src}`;
   }
   
-  // 对于占位图片的处理
-  if (src.includes('placeholder') || src.includes('unsplash')) {
-    return src;
-  }
-  
-  // 默认返回原始src
-  return src;
+  // 为其他路径添加斜杠
+  return `${deploymentUrl}/${src}`;
 }
 
 // 获取完整的图片URL
@@ -50,24 +40,22 @@ export function getFullImageUrl(relativePath: string): string {
   
   // 在开发环境下返回相对路径
   if (isDevelopment) {
-    return relativePath;
+    return relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
   }
   
-  // 确保路径开头有斜杠
+  // 标准化路径
   const normalizedPath = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
   
-  // 使用环境变量或默认值
-  const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_BASE_URL || '';
-    
-  return `${baseUrl}${normalizedPath}`;
+  // 返回完整URL
+  return `${deploymentUrl}${normalizedPath}`;
 }
 
 // 图片加载失败时的回退处理
-export function getImageFallback(originalSrc: string): string {
-  // 提供一个默认的回退图片
-  return `/images/placeholder.jpg`;
+export function getImageFallback(): string {
+  if (isDevelopment) {
+    return `/images/placeholder.jpg`;
+  }
+  return `${deploymentUrl}/images/placeholder.jpg`;
 }
 
 // 检查图片URL有效性的辅助函数

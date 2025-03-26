@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { games, getValidGames } from '../../lib/games';
+import { games, getValidGames, getGameImageUrl } from '../../lib/games';
 import GameEmbed from '@/components/GameEmbed';
 import Image from 'next/image';
 
@@ -129,7 +129,7 @@ export default function GamesPage() {
               <div className="relative overflow-hidden rounded-lg group hover:scale-105 transition-all duration-300">
                 <div className="aspect-[4/3] bg-gray-800 overflow-hidden">
                   <Image 
-                    src={game.imageUrl}
+                    src={getGameImageUrl(game.imageUrl)}
                     alt={game.title}
                     width={400}
                     height={300}

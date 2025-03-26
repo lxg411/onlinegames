@@ -629,18 +629,48 @@ export const validateGameUrls = () => {
 // Get valid games data
 export function getValidGames(): Game[] {
   // 检查是否在本地开发环境
-  const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  // Vercel部署URL
+  const vercelUrl = 'https://onlinegames-rho.vercel.app';
 
   return games.map(game => {
-    // 如果已经是绝对URL，或者是在开发环境中，保持原样
-    if (game.imageUrl.startsWith('http') || isDevelopment) {
+    // 如果图片URL已经是完整URL，保持不变
+    if (game.imageUrl.startsWith('http')) {
       return game;
     }
     
-    // 生产环境中，为相对路径添加基础URL
+    // 相对路径处理
+    const imageUrl = game.imageUrl.startsWith('/') 
+      ? game.imageUrl 
+      : `/${game.imageUrl}`;
+    
+    // 本地环境使用相对路径，生产环境使用完整URL
     return {
       ...game,
-      imageUrl: `https://onlinegames-rho.vercel.app${game.imageUrl}`
+      imageUrl: isDevelopment ? imageUrl : `${vercelUrl}${imageUrl}`
     };
   });
+}
+
+// 更新这个函数以处理游戏URL
+export function getGameImageUrl(relativePath: string): string {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // 如果已经是完整URL，直接返回
+  if (relativePath.startsWith('http')) {
+    return relativePath;
+  }
+  
+  // 标准化路径
+  const normalizedPath = relativePath.startsWith('/') 
+    ? relativePath 
+    : `/${relativePath}`;
+  
+  // 本地开发环境使用相对路径
+  if (isDevelopment) {
+    return normalizedPath;
+  }
+  
+  // 生产环境使用完整URL
+  return `https://onlinegames-rho.vercel.app${normalizedPath}`;
 } 

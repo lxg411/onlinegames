@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { games } from '../../../lib/games';
+import { games, getGameImageUrl } from '../../../lib/games';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
@@ -105,7 +105,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
                 <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-amber-500/20 transition-all cursor-pointer hover:scale-[1.02]">
                   <div className="aspect-[4/3] bg-gray-800 overflow-hidden">
                     <Image 
-                      src={game.imageUrl}
+                      src={getGameImageUrl(game.imageUrl)}
                       alt={game.title}
                       width={400}
                       height={300}

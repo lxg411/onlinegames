@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { games, getValidGames } from '../lib/games';
+import { games, getValidGames, getGameImageUrl } from '../lib/games';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import GameEmbed from '@/components/GameEmbed';
@@ -113,7 +113,7 @@ export default function Home() {
                 <div className="relative overflow-hidden rounded-lg group hover:scale-105 transition-all duration-300">
                   <div className="aspect-[4/3] bg-gray-800 overflow-hidden">
                     <Image 
-                      src={game.imageUrl}
+                      src={getGameImageUrl(game.imageUrl)}
                       alt={game.title}
                       width={400}
                       height={300}
@@ -173,7 +173,7 @@ export default function Home() {
                 </div>
                 <div className="bg-gray-700 h-40 overflow-hidden">
                   <Image 
-                    src={game.imageUrl}
+                    src={getGameImageUrl(game.imageUrl)}
                     alt={game.title}
                     width={400}
                     height={300}
